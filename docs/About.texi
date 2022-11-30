@@ -1,0 +1,189 @@
+
+@menu
+* What is VisualOberon::  What is VisualOberon?
+* Design criteria::       The main design criteria behind VisualOberon.
+* Status::                what is the current status of VisualOberon?
+* Missing::               What is missing?
+* Addresses::             Address of mailinglist, homepage, ftp and the programmer.
+* Oberon-2::              More information about Oberon-2.
+@end menu
+
+@node What is VisualOberon
+@section What is VisualOberon?
+@cindex What is VisualOberon?
+
+VisualOberon (or short 'VO') is a collection of classes written in the
+programming language Oberon-2. The classes are designed to let 
+application developer easyliy build graphical user interfaces for programs
+written in Oberon-2. @emph{VO} is distributed under the GNU library license.
+
+VisualOberon is @emph{not} a programming language. While it sounds like the
+Oberon version of VisualBasic, it is not an integrated developement
+envirinment with build in text editor, builder and that stuff. It is 
+currently just a library. Nevertheless it can be the basis for such integrated
+environment.
+
+Oberon-2 is an object-oriented programming language, a successor of
+Pascal, designed by the renowned Niklaus Wirth. It combines the popular
+and proven design of Pascal (strict type system, easy to read code, easy to
+follow program flow, possibility to naturally structure your source code)
+with the modularity of Modula-2 and enhances both of them with clean,
+simple but powerful object-oriented concepts, including
+inheritance, dynamic type information, virtual methods, various access
+rules on class and module basis and a built-in garbage collector.
+
+VisualOberon uses OOC (@url{http://ooc.sourceforge.net}) and its first
+implementation OO2C as development tool, but VisualOberon's design is
+not limited to that compiler. It fully bases on the language defined by the official
+language report and thus should be easyly adaptable to other compilers.
+  
+@node Design criteria
+@section What are its main design criteria?
+@cindex Design criteria
+
+@table @asis
+@item Simplicity:
+VO should provide a powerful layout tool for the programmer, but
+should also eliminate the need to handle low-level GUI details. It
+should also free from needing to make low-level design decisions.
+In a way it is similar to TeX. You give it a abstract description
+and it will generate a good-looking GUI by its own.
+
+@item Extensibility and flexibility:
+The classes should be designed to make
+them easily extensible. Features missing should be easy to integrate
+without the need to rewrite huge code sections and without breaking
+compability.
+
+@item Portability:
+The class library should be portable so that the classes
+share the same interface among different platforms. Programs
+building an interface under one operating system should be
+portable without any changes to the code. The class library itself
+is not portable because it is implemented by making specific
+OS-dependent calls. VO must be adapted to each OS. However, VO
+tries to build a abstraction layer everywhere where it is
+possible to hide OS-dependent details.
+
+@item Configurability:
+Since VO should be platform independent it must be possible to get a
+native look and feel. VO achieves this not by building a layer on
+the existing API of the OS, but by building its own GUI objects
+which are flexible enough that their look and feel can be easily
+configured to mimic the look and feel of the current OS. While far
+from being perfect, the current version demonstrates the potential
+and proves the concept of a configurable GUI.
+
+@item Modern features:
+VO should give the programmer access to all common GUI features like
+auto font adapting, resizability, and things like drag and drop... It
+should be possible to build a complete state-of-the-art GUI.
+
+@item Free use:
+VisualOberon is available under the GNU programming licence (GPL)
+and thus guarantees free use.
+
+@item Development style:
+The incremental development methodology offers quick updates and
+bug fixes, fast response to problems and good communication and code
+exchange between developers and users.
+
+@end table
+
+@node Status
+@section What is the current status?
+@cindex What is the current status?
+
+Many common object have already been implemented. Key features like keyboard and focus
+handling and drag and drop have already been implemented. VisualOberon has also been
+used as the development basis for a number of programs which have shown the validity
+of the applied concepts. The screenshots on our homepage should show that VisualOberon
+is already beyond its planning phase and is well within its implementation phase.
+Only a few common objects are still missing.
+
+@node Missing
+@section What is missing?
+@cindex What is missing?
+
+While the concept of VisualOberon has been proven, a lot of work still remains. There
+are a number of objects missing. VisualOberon is currently a project led
+by a few people and it is clear that their combined efforts are not enough to make
+VisualOberon the state-of-the-art GUI engine we know it could be.
+
+Thus VisualOberon definitely needs the active support of more people. This should of
+course mainly be programmers but also designers and people with knowledge about various
+systems and concepts are needed. We also need more demo programs and people using
+VisualOberon in real world applications by writing programs. People writing documentation
+are also welcome. In the end, support for hardware in the form of mirrors and ftp access
+for the developers are a good things to have :-)
+
+You ask what you can get back for your investment in supporting VisualOberon? First you
+can learn much about the design and the implementation of a huge project. You learn much
+about the design of a GUI system from the ground of. VisualOberon and it full published
+source code lets you look behind the scenes of a modern, object-oriented GUI. You learn
+much about cooperating and programming in a team.
+
+There are also direct advantages for your own programs. VisualOberon due to its powerfull
+design:
+
+@itemize @bullet
+
+@item
+offers you an excellent platform for rapid protoyping.
+
+@item
+gives quick and safe development of even larger applications.
+
+@item
+multiplies the power and simplicity of Oberon-2.
+
+@item
+provides a powerful, object-oriented design.
+
+@item
+gives you maximum flexibility.
+
+@item
+offers you the best GUI-development tool in years.
+
+@item
+uses a portable core interface to the underlying OS.
+
+@item
+guarantees that your applications will run under a variety of systems.
+
+@item
+has a built-in ability to fundamentally change the look of the GUI.
+
+@item
+guarantees your applications will adapt to the look and feel of any host OS.
+
+@end itemize
+
+@node Addresses
+@section Addresses of mailing list, home page, ftp and address of the programmer:
+@cindex Addresses
+
+@table @asis
+@item The address of the home page is:
+@url{http://visualoberon.sourceforge.net}.
+
+@item The address for source code downloads is currently also:
+@url{http://sourceforge.net/projects/VisualOberon/}.
+
+@item The mailing list can be found on the same page:
+@url{http://sourceforge.net/projects/VisualOberon/}.
+
+@item Contact person:
+Tim Teulings @email{tim@@teulings.org}.
+@end table
+
+@node Oberon-2
+@section Information about Oberon-2
+@cindex Information about Oberon-2
+
+For a first overview over Oberon-2 look at @url{http://www.ics.uci.edu/~oberon/intro.html}.
+
+A huge number of additional information can be found at
+@url{http://www.math.tau.ac.il/~laden/Ob-pkgs.html}. A european mirror will soon be
+@url{http://shulen.Hagen.de/IF/Oberon/}.

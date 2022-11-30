@@ -1,0 +1,1208 @@
+\input texinfo @c -*- texinfo -*-
+@c %**start of header
+@setfilename VODoc.info
+@settitle VisualOberon
+@setchapternewpage odd
+@documentlanguage en
+@documentencoding ISO-8859-1
+@iftex
+@afourpaper
+@end iftex
+@c %**end of header
+
+
+
+@ifinfo
+@documentdescription
+This document describes the VisualOberon GUI system.
+
+VisualOberon is copyrighted under the GNU library license. Read
+the @file{COPYRIGHT.LIB} in the distribution directory for
+a copy of the licence.
+
+The examples and all other contents are under the GNU licence. Read
+the @file{COPYRIGHT} in the distribution directory for
+a copy of the licence.
+@end documentdescription
+@end ifinfo
+
+@titlepage
+@title VisualOberon
+@subtitle A GUI library for the ooc compiler
+@subtitle created @today{}
+@author Tim Teulings
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 1997-2002 Tim Teulings
+@end titlepage
+
+@iftex
+@tableindent=.2in
+@end iftex
+
+@defindex mo
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+@ifnottex
+@node Top
+@top
+@c Description of the document
+
+@menu
+The regular stuff:
+
+* Copying::         Your rights and freedoms.
+* About::           What is VisualOberon all about?
+
+Details of VO:
+
+* Concepts::        In detail description of the Concepts of VO.
+* Configuration::   The configurationsystem of VO.
+
+Index:
+
+* Class index::     Index of all classes
+* Function index::  Index of all functions
+* Attribute index:: Index of all attributes
+* Concept index::   Index of conceptional keywords.
+@end menu
+
+@end ifnottex
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+
+@node Copying
+@chapter Copying
+@cindex Copying
+
+VisualOberon is copyrighted under the GNU library license, see
+@pxref{GNU license} for a copy. 
+
+The examples and all other contents are under the GNU licence if
+not otherwise stated, see @pxref{GNU library license} for a copy. 
+
+@menu
+* GNU license::         The GNU license.
+* GNU library license:: The GNU library license.
+@end menu
+
+@node GNU license
+@section The GNU license
+@cindex GNU license
+@include ../COPYING
+
+@node GNU library license
+@section The GNU library license
+@cindex GNU library license
+@include ../COPYING.LIB
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+
+@node About
+@chapter About
+@cindex About
+
+@include About.texi
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+
+@node Concepts
+@chapter Concepts
+@cindex Concepts
+
+@menu
+* Messagesystem::     Description of the messagesystem.
+* MV-concept::        Description of the model-viewer concepts used in VO.
+* GUIObject concept:: Description of the concept behind the visualisation of
+                      the graphical objects.
+* Drawing concept::   Description of the various drawing classes.
+* Keyboard focus::    How keyboard focus is handled.
+* XpmImages::         Description of the XpmImage handling.
+* Drag and drop::     Description of the drag and drop mechanism.
+@end menu
+
+@comment -------------------------------------------------------------------
+
+@node Messagesystem
+@section Messagesystem
+@cindex Messagesystem
+
+The messagesystem used in VO is rather simple but nevertheless very
+powerfull. It allows you to handle messages using one or both of the
+two common message handling paradigms.
+
+The first common event-handling mechanism is the event-loop aproach. All events
+are handed to a procedure. Within this procedure - the event handler - the programmer
+analyses the type and the source of the handled event and then calles the apropiate
+operations. This aproach f.e. it is used in @file{XTest.Mod} at some place.
+
+Another aproach is to connect events directly to the apropiate actions. This can be
+done by using callback functions. That means that for every event and seperat
+functions is called that exspecially handles the given action. Motif f.e. uses such
+a aproach. A variation of this aproach is, that events directly generate actions by
+using some kind of mapping table. While the first aproach (event loop) better maps
+to the mind and the way of thinking of most programmers and also has the advantage of
+centralizing the operation decision section of your program the callback aproach is
+more fitting for an automatic driven GUI, where the programmer just makes
+"connections" and the event handling and dispatching system of the GUI then
+"automatically" and "automagically" mappes the right stuff. The callback method has
+the disadvantage of spreadding event-handling code all over your program and makes
+it difficult for th programmer to follow event and datatflow.
+
+The callback aproach is also used in @file{XTest.Mod} but is more hidden withing
+the GUI creating code.
+
+As said, VisualOberon supports both aproaches in an easy to use and understandable
+way. VisualOberon does not force th programmer to use on on the other aproach. The
+programmer can switch between both aproaches or even use both of them simultanious
+where @emph{he} thinks its apropiate.
+
+
+The base of the whole eventhandling is realized in module @file{VOObject.Mod},
+implementing the baseclass for all message exchanging and message handling objects.
+It it well commented, but I'll give an in deep description at this place.
+
+The eventhandling will be handled between objects inheriting from @code{MsgObject}.
+All visible objects do, the global display instance and windows do and
+models also do. So messages can be send to who ever you like if it just
+inherits from @code{MsgObject}.
+
+Objects do have a number of actions/msgstypes they can send. They also have a number
+of actions/messages you can send them that will trigger actions at the receiver
+(You can send a close-message to a window and it will close. Otherwise the window can
+send you an close-message when it gets closed).
+
+If your interested in getting notified about an action occouring, you add
+your receiver object (which must inherit from @code{VOObject.MsgObject})
+using @code{MsgObject.AddHandler}. When adding your receiver object you must name
+the msgtype you want to receiv but handing the msgtype id. A message sending
+object defines a unique id for every message type it can handle. There are special id
+common to all message object that state that you want to handle all events from
+that object or that you want to send an event to all handlers (@code{EveryMsg}
+and @code{BroadcastMsg}).
+
+But you do not only want to get notified about an actions ourself but also want
+to trigger new actions for other objects when an action occurred. F.e. you want
+to close the popup-window in XTest when someone presses the OK or Cancel button.
+Since actions may not parameterless we need a generic way to transform the
+send action to another action (which implies on the Oberon level that you must
+convert an instance of one class to another class) that the second object can
+receive. This means, we must transform the Clicked-msg of the buttons to a Close-msg
+for the popup, without the buttons and the popup knowing each other and
+the structure of their messages.
+
+As a consequence we do not pass the receiver directly to
+@code{MsgObject.AddHandler} but we only assign a handler. The receiver object itself
+has to be registered within the handler. The handler must be derived from
+@code{VOObject.Handler} and gets called by the object when it send its
+message. The handler has to return a message itself which then gets send to
+the receiver stated in the handler. The returned message can be the same as
+the passed but it need not to be. That way we can write our own handler that
+transforms the clicked-Msg of the button to a close-Msg of the popup.
+However the popup itself already offers us a special handler that blindly returns a
+close-Msg (regardles of the message received) when it gets called
+(@code{VOPopup.Msg2Close}).
+
+To send a message you call the @code{Send}-method inherited from the
+@code{VOObject.MsgObject} class. You must hand an instance of your message and the
+special id of the type of message you want to send. @code{Send} then will go
+trough the list of registered handlers (registered using @code{AddHandler}) comparing
+the handed msgtype id with the msgtype id registered with each handler. If the ids
+match the @code{Send}-message of the handler will be called handing the message
+instance. The @code{Send}-method of the handler then in turn will call its
+@code{Convert}-method giving you the change to exchange the message type. The
+returned message instance (which can but needs not to be the same as
+the handed message instance) then will be handed to the @code{Recieve}-method of
+the destination object registered within the handler.
+
+This gives us simple eventhandling but also some more advanced
+features. You can now write selfdriven GUIs by adding special handlers to the
+objects or you can use the event-loop paradigm by creating one msg-object,
+which gets all messages of all objects. You can even overload use on of the existing
+message bjects, a window or the global display instance as event handling object.
+You must of course take care to call the method of the baseclass.
+
+The message system is of course not window-based, so clinging together the events
+of different windows is no problem.
+
+@ignore
+@subheading References
+@table @code
+@item XTest.Mod
+  @ref{XTest.Mod}
+
+@item VOObject.Mod
+  @ref{VOObject.Mod}
+@end table
+@end ignore
+
+@comment -------------------------------------------------------------------
+
+@node MV-concept
+@section The MV-concept
+@cindex MV-concept
+
+There are different kinds of graphical objects in VO. Some that trigger
+actions, some that trigger actions and/or hold a state or value and other
+that just show themselfs (They are inherited from
+@code{VOGUIObject.Image}, which has no event handling routines).
+
+Objects that store a value or state (with value we do not mean preference-stuff
+like a frame to choose or something else, but the value store by the object,
+f.e. the string a stringgadget represents or the boolean value of a
+radiobutton), do not store it themself but have a
+reference to an model that implements a variable of the needed type. Of
+cause an object can have more than one model as it can have more than one
+value (A scroller needs 3 values, top, visible and total area). The
+other way round a model can be connected to more than one object, so
+different objects can hold and operate on the same values. The fact that one can
+attach a model to more than one object bears an interesting fact. Changing the value
+of the model you automatically update all of the dependend objects. This way you can
+connect f.e. a scroller and a list by assigning the same model for the top position.
+Each time you then move the scroller the list view updates accordingly. There is no
+need to explicitely handle scrolling events.
+
+The programmer now does not change the value using the object but rather changes the
+value of the model which in turn notifies it objects that it value
+has changed. The baseclass for models is implemented in @file{VOObject.Mod}.
+It owns a number of methods to add or remove objects to models. Notifying is done
+using @code{Model.Notify} which goes through the list of all added objects and
+calls @code{Object.Resync} for each object. The model can add special defined
+messages derived from @code{VOObject.ResyncMsg} to give more information to the object
+about what has happened, but it needs not do so. A object should try to implement
+optimised actions for all messages the corresponding model can send and it should
+do a complete resync, when @code{Resync} is called with no valid message.
+The more information an object gets the better it can redisplay itself and a
+implementor of a model should try to make the message as informative as possible.
+
+Another point is, that the model should only send messages, if its state really has
+changed. Thus setting a boolean model with the value @code{TRUE} to @code{TRUE}
+should not create a @code{ResyncMsg}.
+
+@ignore
+@subheading References
+@table @code
+@item VOObject.Mod
+  @ref{VOObject.Mod}
+@item Model
+  @ref{VOObject.ModelDesc}
+@item BoolModel
+  @ref{VOBoolModel.BoolModelDesc}
+@item IntModel
+  @ref{VOIntModel.IntModelDesc}
+@item StringModel
+  @ref{VOStringModel.StringModelDesc}
+@item ListModel
+  @ref{VOListModel.ListModelDesc}
+@item ResyncMsg
+  @ref{VOObject.ResyncMsgDesc}
+@end table
+@end ignore
+
+@comment -------------------------------------------------------------------
+
+@node GUIObject concept
+@section GUIObject concept
+@cindex GUIObject concept
+
+@menu
+* General object handling:: Description of general handling of objects.
+* Layouting::               Description of the layouting concepts.
+@end menu
+
+@comment -------------------------------------------------------------------
+
+@node General object handling
+@subsection General object handling
+@cindex General object handling
+
+This chapter is a general description of the concepts behind the handling of
+graphical objects. This is only a description of the @code{Object} baseclass
+in @code{VOGUIObject.Mod} and it inherited classes @code{Image}, @code{Gadget}
+and @code{Group}. The use of the other fundamental display classes like
+@code{Display} will only described as necessary. More information about this can be
+found in another chapter.
+
+The typical lifecycle of an object can be divided in a number of states:
+
+@table @asis
+@item Instantation
+Initial instantation will be done by allocating the object using the @code{NEW}
+operator of Oberon-2.
+
+@item Initialisation
+The object gets initialised by calling the@code{Init}-method, which has be
+inherited from @code{VOObject.Object}. If you implement your own object,
+take care that you call the @code{Init}-method of the baseclass and then
+initialise all own members. The init functions should initialize all members of the
+class to a state, where using without further initialisation should do no harm.
+
+Further, optional initialisation can be done by calling corresponding
+methods. Note, that most of the initialisation must be done before the object
+gets layouted first. F.e. labels for a button must be set before the object
+gets layout to get a valid size. However most objects try to be robust, but
+don´t call on that. When you build your own object you should of course try to
+reduce the number of such limits as much as possible.
+
+After that the object gets included into the object tree of the window by
+adding it to a group object with one of the @code{AddXX}-methods or by
+assigning it (most likely for group objects) directly as top object of the
+window to the window.
+
+@item Initial layouting
+Before the window opens itself for the first time the initial size and position of
+the objects within the window must be calculated to get the right size of the window.
+The window achives that by calling @code{CalcSize} for the top objects, which in turn
+calls it for all its subobjects to determine its own bounds in dependence of the
+bounds of it subobjects.
+
+@item Displaying, hiding, redrawing
+After the window has calculated it bounds it opens itself and draws the top object
+with (again) in turn draw itself and all its subobjects. When the window gets closed
+it hides the top object, so that the top object and all it children know that they
+not visible and must not update themselfs. Drawing will be done using @code{Draw},
+hiding via @code{Hide}. There also also exists a @code{Rdraw} method for
+convinience which calls @code{Draw} with the coordinates currently stored within
+the object. Howver because of the dependence of initialisation of internal
+structures @code{Redraw} may only be called after a first call to @code{Draw}.
+
+If the window gets covered, redrawing of parts of the window contents may be needed.
+This will be achieved by calculating the rectangle that contains the the damaged
+area and tells the top the refresh that part by calling @code{Refresh}. The top
+object then redraws itself (it should try optimised this procedure as much as
+possible). After that it tells all its children that intersect with the dirty area
+to redraw themself within the dirty rectangular.
+
+Another possible action that needs redrawing is the resizing of a window. This
+works in a similar recursive way: The window finds out its new size and resizes
+the top object, which in turn resizes all its children. Since not all object
+may want to be resized an object can optimise the resizing by questioning the object
+first if it is able to grow or shrink. After the window has resized the top object
+and by doing this all the children, it clears the display and redraws the top object.
+
+@item Change of configuration
+Another special action is when the uses changes the preferences. The programmer must
+the force a complete redraw of all windows by calling
+@code{VODisplay.Display.ReinitWindows}. Each window then in turn calles
+@code{CalcSize} (again) for the top object (and all its subobjects), resizes itself
+to the new bounds and redraws the window contents. As a consequence
+@code{CalcSize} can be called more then once. An objects must be prepared for that.
+F.e. it must be aware that @code{CalcSize} and @code{Free} are not called in pairs.
+An object can check if @code{CalcSize} has been called for the first time by checking
+the existance of the flag @code{VOGUIObject.inited} in
+@code{VOGUIObject.Object.flags}. If the flag has been set, @code{CalcSize} has
+already been called.
+
+@end table
+
+@comment -------------------------------------------------------------------
+
+@node Layouting
+@subsection Layouting
+@cindex Layouting
+
+This chapter will introduce the layouting concepts behind VisualOberon, which
+garanty the generation of fontsentiv and resolution independent GUIs. The chapter
+will be devided intwo two sections. The first sections describe the routines
+involded in calculating the size and the size restrictions of an object itself.
+The second subsection will describe how group objects work and how the layout of a
+dialog can be described by grouping and combining the various grouping objects.
+
+@menu
+* Object sizing:: Calculaion of the object size.
+* Grouping::      Grouping objects together.
+@end menu
+
+@comment -------------------------------------------------------------------
+
+@node Object sizing
+@subsubsection Object sizing
+@cindex Object sizing
+
+The bounds of an object are described by a rectangular area. The object is the
+complete owner of the drawing area within its bounds. While other objects may draw
+into the area of foreign objects as long as they handle correct refreshing
+they are urged not to do so. But the size of an object is not only defined by its
+bounds, defined by the x and y coordinates of its upper left corner and the width
+and the height of the object.
+
+Size dynamic reszing is an inherent feature of VisualOberon the size of an object
+is not onyl defined by it current width but an object also has minimal and maximal
+bounds. The @code{Init} method of the @code{VOGUIObject.Object} initializes the
+minimal bounds to zero and the maximal bounds to the largest possible number
+(i.e. @code{MAX(LONGINT)}). For most objects of course this a not useable numbers. So it
+is the duty of the object to reassign sensable minimal and maximal bounds. The place
+to do this is within the @code{CalcSize} method. For example, a string object should
+at least as heigh as the used font plus the vertical bounds of the frame and it
+should be at least as width as the width of a string containg a few letters of the
+used font plus the horizontal bounds of the surrounding frame.
+
+While sizes are internaly described in pixels, this is not the best way to describe
+sizes since the size of an object in most cases depend of the font size and
+other aspects. To support this VisualOberon offers to the possibility to calculate
+the sizes of printed text using special fonts and it also offers you the two
+memebers of @code{VODisplay.Display} @code{spaceWidth} and @code{spaceHeight} which
+are closely bound the the size of the normaly used font. Fractions and multiples of
+theses values should be used for sizing objects.
+
+In many cases an object consists of a number of other objects. A button f.e. consists
+of an objects that serves as label and a frame object. The size of the button
+results in the width and height of the label object (you must call @code{CalcSize}
+for this object) and the frame thickness of the frame object. Also there should be
+some space between the frame and the label. The size of this space should be a
+fraction of the above named size properties of @code{VODisplay.Display}. An object
+should also respect the minimal and maximal bounds of its components. The button
+must not be smaller than its label. In practice this means that the calculation used
+for the evaluaton of the current size must be done also for the minimal and maximal
+bounds. Currently most objects only respect the minimal bounds of its component
+objects. Future version of VisualOberon will fx this.
+
+But sizes are not only defined by the object itself. Sometimes the designer
+of a dialog want to specify the size of an object explicitely. because of that there
+various @code{SetXXX} methods, which give the developer the possibilty to exactly
+define minimal, normal, maximal width and height. Also, since - as stated before -
+pixel measurements are not optimal, the @code{SetXXX} methods offers various
+measurements modes, like factions and multiples of the @code{VODisplay.Display}
+space units.
+
+Another way of manipulating the sizing of an object is setting special flags in the
+@code{flags} memeber of @code{VOGUIObject.Object}. The flags @code{horizontalFlex}
+and @code{verticalFlex} allow resizing for the specified direction. If the flag for a
+direction is not set, @code{CalcSize} will automatically set the minimal and maximal
+bounds for that direction to the "normal" bounds. Thus all sizes and sizings must
+be set before @code{CalcSize} is called. This is normally before the window gets
+opened the first time.
+
+@comment -------------------------------------------------------------------
+
+@node Grouping
+@subsubsection Grouping
+@cindex Grouping
+
+Most GUI systems use a rather primitive way for layouting a dialog. Most
+GUI systems only allow hardcoded placement (possibly specified within a
+builder program) or use a rubber band based concept. VisualOberon uses another way
+Since both mentioned aproaches don't work well when fontsentitivity is needed,
+when senseable reszing is needed or when the contents of a dialog get more
+complex such that layouting cannot be described well.
+
+Instead VisualOberon follows the path of object orientation a step further and
+defines a second kind of objects that represent a collection of child, sub or
+component objects and that are responsible for layouting all it children. Thatfor
+VisualOberon offers a class named @code{VOGUIObject.Group} derived from
+@code{VOGUIObject.Object} as baseclass for all grouping objects. @code{Group} offers
+an @code{Add} method, a list of child objects, filled by the @code{Add} member, and
+it implements the methods inherited by @code{Object} in a sensable way. From the
+view point of the programmer the @code{Group} serves as a collection in which you
+can trow objects using the @code{Add} method.The @code{Add} method and the list
+of object must of course not used, they are only a convienient feature, since they
+reduce the code to be implemented for most group objects. However the group
+object should support the @code{Add} method somehow if possible.
+
+While VisualOberon offers you a rich set of group objects you are not restricted
+to them. You can alway implement your own groups by inheriting from @code{Group}
+and overwriting and implementing all needed methods. So it is no problem to implement
+a HTML-like layouting group in which you can throw text and images togheter with
+layouting information are a group which aranges all objects in a circle.
+
+Also the programmer is not restricted to two hierachie levels (objects within groups).
+Since groups itself again are objects you can put groups cotaining objects (or groups)
+in another group and so on. As soon as you have a HTML-like and a circle group
+its is no problem to put your circle of objects into your HTML page.
+
+At this place a special object should be metioned, that helps layouting within an group
+object: The space object (@file{VOSpace}). A space object uses a specified amount of
+horizontal or vertical space without drawing anything. A space object can be used to
+add space between objects. We now the use of groups, space and normal objects and
+their interaction in the layouting process using a few simple examples.
+
+For the examples we will postulate a special group object: The group object will display
+all its members horizontally from left to right. The group will be as high as the
+highest memeber. Members smaller then the group will be centered vertically. If the
+with of the group is greater than the sum of of the withs of all its members, it will
+try to enlarge all children that are enlargeable equally. We will drop a number of
+buttons into the group. Details about the button are not interesting in this examples.
+
+We use the following symbols for the various objects: @code{>} represents the left
+edge of the group, @code{<} the right edge. @code{x} and @code{X} stand for a button,
+@code{_} symbolizes as space object.
+
+@enumerate
+@item
+Ok, example one: We simply drop a number of horizontally differently sized buttons
+into the group. Since we do not set @code{horizontalFlex} the buttons are not resizeable.
+
+@example
+>XXXxxXXXX<
+@end example
+
+The buttonn will simply be drawn from left to right with no space between them. This is
+a in most cases unwanted layout.
+
+@item
+Normally we at least some space between the buttons. We add some horizontal space objects
+between the buttons. The space object will not have @code{horizontalFlex} set, too.
+
+@example
+>XXX_xx_XXXX<
+@end example
+
+@item
+The above examples are the constalations resulting in the initial calculation in
+@code{CalcSize}. Adding @code{horizontalFlex} to the buttons or the space object will not
+change the layouting since there is no space left for resizing. Because of the we asume
+in the following examples, that the group is wider than the sum of the widths of its
+contens. The can be because the object our group is child of is wider and has resized
+the group or because of window resizing of the user. The resulting relayuting will be done
+in the @code{Draw} method of the group. Initial layouting in @code{CalcSize} and
+delayed layouting in @code{Draw} is common for groups.
+
+In this example we add buttons and spaces as dexribed and without @code{horizontalFlex}
+set.
+
+@example
+>XXX_xx_XXX            <
+@end example
+
+As described the group will draw objects from left to right. Since the group cannot
+resize its contents (because of the lacking @code{horizontalFlex}) the objects
+are simply left aligned and have their initial width.
+
+@item
+We now set @code{horizontalFlex} for the buttons.
+
+@example
+>XXXXXXX_xxxxxx_XXXXXXX<
+@end example
+
+The group now can resize the buttons adn thus will divide the space left equaliy between
+the buttons. Note, that this does not result in all buttons equaly sized. If their
+initial size is different and the get resized by the same amount they are of course
+differently sized after the layouting process. Also decrising the size of the group to its inital
+size will result in case two.
+
+@item
+We now set @code{horizontalFlex} not for the buttons but for the spaces.
+
+@example
+>XXX_______xx_______XXX<
+@end example
+
+This has been somehow exspected, or?
+
+@item
+Ok, now for something completely different ;-) We add a new space object in front
+of the first button and set@code{horizontalFlex} only for that special space object.
+
+@example
+>____________XXX_xx_XXX<
+@end example
+
+Ups, suddenly we have right aligned our groups of buttons.
+
+@item
+
+Now we do not only add a space object in front of the first button but also after the last
+button. For both spaces we set @code{horizontalFlex}.
+
+@example
+>______XXX_xx_XXX______<
+@end example
+
+After left and right aligment this example results in centered buttons within the group.
+
+@end enumerate
+
+@comment -------------------------------------------------------------------
+@node Drawing concept
+@section Drawing concept
+@cindex Drawing concept
+
+@menu
+* Display::  The display class.
+* DrawInfo:: The DrawInfo class.
+@end menu
+
+@comment -------------------------------------------------------------------
+@node Display
+@subsection Display
+
+Most GUI systems need somekind of handle that represents a connection to the
+graphic subsystem (X11) or work as a general handle to the GUI.
+
+In VisualOberon the @code{VODisplay.Display} class does this. Before you can
+use VisualOberon you must create and successfully initialize an instance of the
+@code{Display} class. You can do this f.e. with the following code:
+
+@example
+...
+
+VAR
+    d : VODisplay.Display;
+...
+
+BEGIN
+  NEW(d);
+  IF ~d.InitDisplay("XTest") THEN
+    Err.String("Cannot init application!"); Err.Ln;
+    HALT(1);
+  END;
+
+  ...
+@end example
+
+Note, that initialisation of the display can fail. Possible Reasons for this can
+f.e be, that you don't have an X sever running. Note also, that it normally does
+not make sense to initialize more than one instance of @code{Display}.
+
+The @code{Display} class also serves as interface to the event-loop. In VisualOberon
+each window does not have a separate event-loop but it does exist @emph{one} event-loop
+that dispatches the events itself. It does wait for events from the graphics subsystem
+and delegates them. The event-loop can be started by calling @code{Display.Handler}.
+This methods will return when the global event-loop has been stoped. You can stop
+the event-loop by calling @code{Display.Exit} or by sending an exit message to the
+display. You can restart the event-loop by calling @code{Display.Handler} again.
+
+The @code{Display} class also serves other global ressources. These are colors, fonts,
+the selection mechanism, timed events, window handling, tooltips and general drag and
+drop handling. We'll describe certain features in place, other are described in
+separate chapters.
+
+@menu
+* Color handling:: Describtion of color handling in VisualOberon.
+* Font handling::  Describtion of font handling in VisualOberon.
+@end menu
+
+@comment -------------------------------------------------------------------
+@node Color handling
+@subsubsection Color handling
+@cindex color handling
+
+As a convinience for the developer of GUI objects and for a easy configuration of general
+look and feel, VisualOberon already offers a number of building colors by defining a number
+of predefined pens, named by an abstract purpose description. F.e. there exists a color
+handle for the globally defined window background and a color handle for text color.
+You should use this default pens everywhere where possible. These colors are granted to
+be defined senseable and using them will take away from you the work of handling various
+possible color depths.
+
+Howver the programmer can allocate its own colors. Custom color handling in VisualOberon
+is currently rather simple. It is designed for work for a limited number of colors
+because for each color used a internal structure is allocated. Allocating a huge number
+of colors may result in huge memory consuption. There is also a hardcode limit of
+maximal allocatable colors (@code{MAX(LONGINT) DIV 2}).
+
+Custom color handling is based on allocating a color when needed and freeing it when it
+is no longer needed. For allocating a color, two ways can be used: Allocating a color by
+its name (which names exist may be dependent of the operating system or even the computer
+the program is running) using @code{AllocateNamedColor} or by giving the @code{rgb}
+value of the color, where every part is described by a @code{LONGINT} value
+(@code{AllocateColor}). While a @code{LONGINT} has a rather huge resolution (32 bits)
+VisualOberon is free to cut the resolution down to a lower resolution.
+
+Another important thing to now, is, that VisualOberon does somekind of
+color sharing. This means, that, when two objects allocate the same color, both will
+share the same handle. VisualOberon internaly does somekind of reference counting. Only
+when all objects free the color, it gets really deallocated. This means that a handle
+can be valid, even when the object already deallocated the handle. Don't count
+on that! You should use color names as often as possible, to ensure, that color
+sharing can be as effective as possible and reduce the number of system colors used. Most
+display have a limit of globaly allocated colors.
+
+The allocation of a color can fail. Reasons can likely be found on the operating
+system side. Allocating colors might fail on lower or monochrome displays. The maximum
+number of globaly allocated colors migh have been reached. However it is possible, that
+VisualOberon (or the underlying operating system) might return a color close to the
+original color values or even dither the color. Note, that you can query the
+number of colors by examing the @code{colorMode} and @code{colorDepth} members of
+@code{Display}. To reduce the problem of handling of failed color requests and
+to make the application more robust regarding external ressources, you must always hand a
+default handle (wich should abviously be maped to some internaly offered abstract color
+handle). The allocation methods will automatically return the default handle when
+the allocation of a pen failed.
+
+Freeing of colors in VisualOberon is rather tricky since garbage collection does not
+work for it (it is possible that this may change, when an mechanism for finalisation
+within the garbage collector exists.). You must explicitely free a color, or frequent
+allocation of colors might result into a color overrun over the time. Best way to do
+semi-automatic color freeing is by using the build methods of registering objects
+within the destruction of windows.
+
+@comment -------------------------------------------------------------------
+@node Font handling
+@subsubsection Font handling
+@cindex font handling
+
+Font handling in VisualOberon is currently rather primitive. As with colors
+VisualOberon supports a number of predefined fonts. There exist two classes of
+predefined fonts: One for pproportional fonts and one for fixed fonts. Proportional
+fonts constants are named similar to @TeX{} font sizes. VisualOberon supports at the
+moment only one fixed font.
+
+The @code{DrawInfo} class offeres you a number of ways to calculate the size of an string
+in respect to a given font.
+
+@comment -------------------------------------------------------------------
+@node DrawInfo
+@subsection DrawInfo
+@cindex Drawing
+
+Similar to other graphics engines VisualOberon has a class that stores all
+information necessary for drawing into a window. The methods of this class offer
+you a number of ways to draw into a window. @code{DrawInfo} encapsulates the OS-dependend
+details from you and hides them behind its interface. Each window has its own instance
+of @code{DrawInfo} since the information hold are specific for one window. Because of that
+and because of the graphical objects storing the offered instance one must take special
+care when trying to draw an object into different windows. Also, while it should be in
+priciple possible, VisualOberon does currently not support the allocation of more than
+one instance of @code{DrawInfo} for a window. You must use the instance allocated and
+handed by the window.
+
+One concept that is used when handling various attributes of drawing like pen size
+and font type, is that of pushing and poping these attributes.
+
+Existing attribute values are not overwritten but the old various are pushed on a stack
+and then the new values are set. When you don't need the set values you must then pop them
+of the stack and by this restore the old values. You must take care that your call
+push and pop methods in pairs! If not, you will get strange effects, most likely
+object using wrong attributes, like wrong colors or wrong fonts. VisualOberon checks,
+after a instance of @code{DrawInfo} gets deleted aka a window has been closed, if all stacks
+are empty and will dump a warning if not.
+
+This aproach has advantages, since objects need not to store old attribute values when
+setting them. However, since currently most object exspect default values for some
+attributes (f.e. all objects assume that the pen size is zero) one should not have
+attributes pushed while calling drawing routines of other objects.
+
+@menu
+* Clipping:: The clipping mechanisms.
+@end menu
+
+@comment -------------------------------------------------------------------
+@node Clipping
+@subsubsection Clipping
+@cindex Clipping
+
+@center Not done yet.
+
+@comment -------------------------------------------------------------------
+@node Keyboard focus
+@section Keyboard focus
+@cindex Keyboard focus
+
+Using, handling and displaying of keyboard focus can be divided in to three parts.
+
+@menu
+* Display and window::        Interaction bettween Display and Window.
+* Keyboard handler class::    The keyboard handler class.
+* Object and keyboard focus:: The support for keyboard focus within the GUI
+                              object itself.
+@end menu
+
+@comment -------------------------------------------------------------------
+@node Display and window
+@subsection Display and window
+
+@center Not done yet.
+
+@comment -------------------------------------------------------------------
+@node Keyboard handler class
+@subsection Keyboard handler class
+
+The task of the keyboard handler class is to store the list of objects that
+has been registered by the programmer via the @code{AddFocusObject}-method.
+It purpose is also the implement the abstract interface defined by the interaction
+between the @code{VODisplay.Display} and the various window classes derived from
+@code{VODisplay.Window}. It has to handle focus displaying when the window
+gets (de)activated and when the window (called by the display) wants a new
+object to focus.
+
+@comment -------------------------------------------------------------------
+@node Object and keyboard focus
+@subsection Object and keyboard focus
+
+The objects uses itself some flags in the @code{VOGUIObject.Object.flags}
+attribute to hold information about its state regarding keyboard focus handling:
+
+@table @code
+@item stdFocus
+The object uses the build in way to graphically display that it has the
+keyboard focus. The default way is to draw a frame around the object.
+@code{CalcSize} automatically allocates enough space to display the
+focus (in fact this is the reason for using separate attributes
+@code{width}, @code{height} and @code{oWidth}, @code{oheight} for
+differentiating between the interior and exterior size). Other objects
+should always use the later one while the object itself should always
+use the first attributes for dealing with its bounds.
+
+@item canFocus
+This flag signals, that the object is prepared to handle keyboard input
+when it has the keyboard focus. A button f.e. can be selected by using the
+@key{space}-key, a scrollbar can be scrolled by using the @key{cursor up}
+and @key{cursor down} keys. This flags to not state that the object can
+@emph{display} the focus since this is allways possible using the
+build in default facilities.
+
+@item mayFocus
+This flags means, that the object has been added to the keyboard chain and
+thus should prepare itself to display its keyboard frame. It should f.e.
+reseve extra space for the frame. This flag will be set by the keyboard
+handler object for a registered object or by a registered object to delegate
+the display of keyboard focusing to a sub object. A button f.e. may delegate
+the display of the focus frame to its label, most likely when the label itself
+does not use the build in focus frame display routines but its own (which will
+be signalled by the @code{stdFocus} flag).
+
+@item hasFocus
+This flag will be set when the object currently does have the keyboard focus.
+The flag will be set and cleared by the @code{CatchedFocus} and @code{LostFocus}
+methods of the @code{VOGUIObject.Object} baseclass which in turn will be called
+by the keyboard handler of the window. This methods will also call @code{DrawFocus}
+and @code{HideFocus} methods which are responsible for drawing and hiding the
+keyboard focus frame (the baseclass methods will implement drawing a focus via
+the build in way).
+
+When doing drawing and refreshing and the @code{hasFocus} flag of the object
+is set the object should then also call its @code{DrawFocus} method. A object
+should not set the flag for its sub objects (e.g the label of a button) but
+should call their @code{DrawFocus} method within its own @code{DrawFocus}
+method. Look at the description of the @code{showFocus} flag for that case.
+
+@item showFocus
+This flag will be set by an object that has the keyboard focus
+(@code{CatchedFocus} has been called and @code{hasFocus} has been set within this
+method) for a subobject (f.e. the buttons sets it for its label) to signal
+the subobject that it should display a keyboard focus when drawing. The flag must
+clear when the focus has been lost (@code{LostFocus} has been called). An object
+should be check, if it has to draw the focus by calling @code{DisplayFocus}, which
+will return @code{TRUE} when either @code{hasFocus} or @code{showFocus} have been
+set and the object does not have @code{stdFocus} set (@code{Draw} will draw the
+standard keyboard frame, when @code{stdFocus} is set).
+
+@end table
+
+To summerise, there are two different kinds of object dealing differently with
+focus displaying:
+
+Objects (likely gadgets or group objects) that handle keyboard input on
+keyboard focus directly get the focus when @code{CatchedFocus} has been called
+and loose it when@code{LostFocus} has been called. When @code{stdFocus} has been
+set no more interaction is necessary since @code{DrawFocus}, @code{HideFocus}
+and @code{Draw} handle everything automatically. If there want to display a
+custom focus the must overload @code{DrawFocus} and @code{HideFocus} and
+must draw the focus in @code{Draw} when @code{hasFocus} has been set. If
+@code{mayFocus} has been set, the object must prepare itself to display
+its focus and must eventually reserve extra space while layouting in
+@code{CalcSize}.
+
+If the object wants to delegate the displaying of the focus to another subobject
+it has to overload @code{CatchedFocus} and @code{LostFocus} and set / clear the
+@code{showFocus} flag for that subobject. It does not have to call extra code
+in @code{Draw} since the subobject knows that it displays the focus and will
+do that automatically when @code{Draw} gets called.
+
+Passive object using the default way of displaying focus don´t have do to
+anything to support focus framing.
+
+If they want to implement custom focus displaying the should clear the
+@code{stdFocus} flag to signal this. They also must overload the
+@code{DrawFocus} and @code{HideFocus} methods to handle focus switching and
+must also check the result of @code{DisplayFocus} within @code{Draw} (and possibly
+other drawing methods like @code{Redaw}and @code{Refresh}) to display
+the focus in that routine, too.
+
+Active object are urged to only delegate focus displaying when the subobject
+support its own way of focus displaying, e.g. @code{stdFocus} is @emph{not}
+set.
+
+Note also, that, if you overwrite other drawing methods like @code{Redaw} and
+@code{Refresh} you are responsible for drawing the keyboard focus, too, even
+if you are using the default methods of focus displaying.
+
+@comment -------------------------------------------------------------------
+@node XpmImages
+@section XpmImages
+@cindex XpmImages
+
+VO supports loading and displaying of Xpm images trough the
+@code{VOXpmImage}-class. To get the best result, there are some
+restrictions you must consider, if you are using this class:
+
+Since VO handles all display types from monochrome upto true colour your
+images must display themselves on all these displays, too. The get this
+working, you must extensively use the possibilities the xpm-format offers.
+Thus you @emph{must} define a reasonable colour for all four display types xpm
+supports (m, m4, g, c). To support the correct display of images, VOXpmImage
+does even more for you. It offers all its internal coloursettings as
+symbolic name for you. Thus to get the background of your image with the
+correct background colour currently used by VO you can specify a symbolic
+name for your backgroundcolour named @code{background}.  For all symbolic
+colours supported, look at the end of @file{VODisplay.Mod}-module.
+
+@comment -------------------------------------------------------------------
+@node Drag and drop
+@section Drag and drop
+@cindex Drag and drop
+
+Drag and drop today is a common mechanism for manipulating data and ease the
+use of dialogs. This chapter describes the use of drag and drop from the view
+of the user and then the internal drag and drop mechanisms of VisualOberon and
+how one can integrate drag and drop within its own application or object.
+
+@menu
+* Drag & drop for the user::       How drag and dropcan be used by the user.
+* Internal drag & drop mechanism:: How to implement your own drag and drop.
+@end menu
+
+@comment -------------------------------------------------------------------
+@node Drag & drop for the user
+@subsection Drag & drop for the user
+@cindex Drag & drop for the user
+
+Drag and drop is initiated by pressing the drag and drop mousebutton (under
+X11 this is the middle mousebutton) ofter an object (the drag object)
+and then moving the mouse while holding the mousebutton. The mouse pointer
+will change to show the start of dragging. You can then move the mouse
+(while still pressing the mousebutton) to the object (the drop object)
+where you want the drop the data associated with the draged object
+on. The drag and the drop object can be in different windows but the windows
+must (currently) belong to the same application. VisualOberon does not
+support inter application drag and drop yet.
+
+One of a number of different actions can be associated with drag and drop. Which
+action has been choosed will be visualised by the mouse pointer.
+Which action is choosed depends on the keyboard qualifier you have pressed
+when starting the drag. There is also some default action assiciated with
+each object type. If you do not press a qualifier that action will be choosed.
+
+The different actions are:
+
+@table @asis
+@item copy (@kbd{control qualifier})
+  The data associated with the drag object will be copied to the drop
+  destination.
+
+@item move (@kbd{shift qualifier})
+  The data associated with the drag object will be move to the drop
+  destination. That means, the data will be deleted at the drag object
+  copied to the drop objec.
+
+@item link (@kbd{shift and control qualifier})
+  The data will not be copied but a link between the drag and the drop object
+  or their data will be established.
+
+@end table
+
+@comment -------------------------------------------------------------------
+@node Internal drag & drop mechanism
+@subsection Internal drag & drop mechanism
+@cindex Internal drag & drop mechanism
+
+The way VisualOberon internally is rather complex but most of the protocol
+stuff will be handled by VODisplay.Window - the window baseclass - so normally
+you just need to implement a few nw methos for an object to support drag
+and drop.
+
+The drag and drop information flow will shown following the methods that
+get called while doing drag and drop.
+
+@table @code
+@item VOWindow.GetDnDObject
+After the window got the special combination of mouse and key events that possibly
+start a drag action it asks itself for an drag object under the mousepointer by
+calling @code{Window.GetDnDObject}. Each window inheriting from @code{VODisplay.Window}
+must overload this method and in turn must ask its top object by calling
+@code{Object.GetDnDObject}. Group object must delegate the call to all the object
+they contain while other object must check if they are under the mouse pointer and must
+check if support dragging of data. If they do so they must return a pointer to
+themself.
+
+@item Object.GetDragInfo
+The widow base class then ask this object to fill the handed DnDDragInfo instance
+with information about the datatype group and datatypes it supports, the possible actions
+it supports for each entry and the default action is defines for each entry. The window
+then changes the mouse pointer to the action the used selected by using the mentioned
+special qualifiers. Then it just polls the event loop as usual until the user raises
+the mouse button again.
+
+@item VOWindow.GetDnDObject
+It then calls @code{VOWindow.GetDnDObject} again, now to find out the drop object
+in the destination window (which can be the same as he window of the drag object).
+
+@item Object.GetDropDataType
+If the destination window is not blocked (f.e., because some modal window has been
+opened) and drag and drop object are not equal the window then calls
+@code{Object.getDropDataType} handing the @code{DnDDataInfo} structure and the drag
+and drop action choosen by the user. The Object then has to return the datatype group
+and datatype it wants to get from the drag object. It may analyse the structure
+itself but it may also the select mechanism build in in @code{DnDDataInfo} for
+convinience.
+
+@item Object.GetDragData
+If the drop object has selected a datatype this datatype will the be requested
+from the drag object by calling @code{Object.GetDragData}. The object returns
+an instance of the @code{DnDData} object. The @code{DnDData} object can be overloaded
+to return any datatype you like.
+
+@item Object.handleDrop
+After that the window hands the @code{DnDData} object recieved by the drag object to
+the drop object together with action. It is then the task of the drop object to
+interpret the type of @code{DnDData} and the action.
+
+@end table
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+
+@node Configuration
+@chapter Configuration
+@cindex Configuration
+
+VO implements a powerfull configurationsystem, which enables the user
+to adapt the look and the feel of VO for his own likes.
+
+@menu
+* Configuration concepts:: Description of the concepts of the configuration system.
+
+* Display configuration::  The configurationfile for the display.
+@end menu
+
+@comment -------------------------------------------------------------------
+
+@node Configuration concepts
+@section Configuration concepts
+@tindex Configuration concepts
+
+The purpose of the configuration and preference system is maximum
+usebillity and flexibility. It archives by using a well named and
+ordered number of textual configurationsfiles. VO searches for this
+files in the directory @file{.VisualOberon} in the homedirectory of the
+user.
+
+Like VO itself, which splits itself into a number of modules, each of
+this modules has its own configuration file. The name of the
+configurations is closed bound to the name of the corresponding module.
+All configurationfile end in @file{.res}
+
+Each of this files follows the same syntax:
+
+A configurations file consists of a number of blocks. Each blocks
+starts with @code{BEGIN} follow by the name of the block, after that a
+number of entries and ended by the word @code{END}.
+
+A entry consists of a name follow by @code{:=} and a value. A value
+can be a name, a number, a string beginning and ending with @code{"} or
+@code{'}. It its possible that an entry consists of a list of values,
+values are then separated by @code{,}. Since VO supports nested
+structures another possible value is another block. Entries itself are
+separated by @code{;}. Names are alphanumeric, starting with a
+character and are casesensitive.
+
+You can also use comments, which start with a "#" and go till the end of the
+current line. Note, that configurationsfiles might get generated and comments
+will then be lost.
+
+An example:
+@example
+BEGIN COLORS
+  backgroundColor      := "grey70";
+  textColor            := "black";
+  shineColor           := "grey95";
+  shadowColor          := "grey20";
+  fillColor            := "royal blue";
+  fillTextColor        := "black";
+  tableBackgroundColor := "white";
+  textBackgroundColor  := "white";
+  cursorColor          := "red";
+  halfShineColor       := "grey82";
+  halfShadowColor      := "grey45";
+  warnColor            := "red";
+  disabledColor        := "grey20";
+  focusColor           := "grey30";
+  blackColor           := "black";
+  whiteColor           := "white";
+END
+
+BEGIN FONTS
+  fixedFont  := "fixed";
+  smallFont  := "-adobe-helvetica-bold-r-normal--12-120-75-75-p-70-iso8859-1";
+  normalFont := "-adobe-helvetica-bold-r-normal--12-120-75-75-p-70-iso8859-1";
+  bigFont    := "-adobe-helvetica-bold-r-normal--12-120-75-75-p-70-iso8859-1";
+END
+@end example
+
+@comment -------------------------------------------------------------------
+
+@node Display configuration
+@section Display
+@tindex Display configuration
+
+VO has a separate configuration file for each possible display and for
+every display a separate file for each colourmode. The name for a
+display gets generated by the name @file{Display} followed by a point,
+followed by either @file{mono}, @file{grey} or @file{colour}, depending
+of the colour resolution your display uses, followed by another point
+and the ended by the contents of your @var{DISPLAY}-variable, which
+normally consisting of the name of the computer followed by an optional
+screennumber. As all configurationfiles the files end in @file{.res}.
+
+An example:
+@example
+Display.color.edge:0.0.res
+@end example
+
+Display consists of two blocks: @var{COLORS}, describing the colours to
+use, and @var{FONTS}, describing the fonts to use.
+
+The different colour- and fontdefinitions VO supports and their
+defaultvalues can be found at the end of the file @file{VODisplay.Mod}.
+Since they are likely to change, their are not described here yet.
+Colornames and fontnames follow the definition of the operating system.
+Examples can be found in the @file{VisualOberon} subdirectory of the VO
+archive or in the example given above.
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+
+@node Class index
+@chapter Index of all classes
+@cindex Class index
+
+@printindex tp
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+
+@node Function index
+@chapter Index of functions and methods
+@cindex Function index
+
+@printindex fn
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+
+@node Attribute index
+@chapter Index of variables, attributes and constants
+@cindex Attribute index
+
+@printindex vr
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+
+@node Concept index
+@chapter Concept index
+@cindex Concept index
+
+@printindex cp
+
+@contents
+
+@bye

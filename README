@@ -1,0 +1,156 @@
+
+                             VisualOberon
+                             ------------
+
+This is a version of VisualOberon (VO). The purpose of this
+text is to give a short introduction to VO and the purpose of this
+release. Also included is a description of what the various files
+in this archive are and how the can be grouped into parts with
+different functionalliy.
+
+Also you can find information how to compile/install VisualOberon in
+this file.
+
+Fore even more informationen look at the homepage of the
+VisualOberon project:
+
+http://visualoberon.sourceforge.net
+
+
+Why this release?
+-----------------
+
+A more in detail desription of the purpose of this release can be found
+in the file ABOUT in the same directory.
+
+
+What do you need to use VO?
+---------------------------
+
+You need to install a number of programms/packages before you can
+compile and use VisualOberon.
+
+Please look at the VisualOberon homepage for information about this
+packages, how to get and how to install them.
+
+VO was implemented using Linux for x86 (Currently current Debian version)
+under KDE 3.1. However different versions of VisualOberon have
+been successfully compiled under various unix-plattforms which
+support X11. So no problems should occure.
+
+
+How to compile and install?
+---------------------------
+
+Copy the complete archive anywhere you like and where you can compile
+it using oo2c.
+
+Call the configure script located in the main directory of the archive.
+Call "configure --help" to see what options you can set.
+
+The configure script the will find out what software you have installed
+and where it is placed. It exspecially looks for imlib and the various
+libraries supported by imlib. Imlib is a library supporting the loading
+of various graphics formats.
+
+At the end fo the analysis of your system the configure script will
+generate a makefile.
+
+To then compile VisualOberon just type "make". The makefile will then
+automatically compile a static or dynamic library (depended of your
+system features).
+
+After that you can type "make install" which will install the created
+library within the oo2c directry tree. Note, that you may need special
+rights on your system to install VisualOberon. You may have to be
+superuser.
+
+After that VisualOberon has been installed and you can then start
+hacking away.
+
+For first test, go to the "demos" subdirectory. The demos should have been
+already compiled by the make in the main directory.
+
+After that you can run the demos and watch. A short description of the
+demos can be found in the info documentation, too.
+
+Please read the README in the demos subdirectory for more information.
+
+There is also a tools directory that contains tools that ease the work with
+VisualOberon.
+
+
+Contact
+-------
+
+If you have questions, problems with installation you can contact the
+developers via the VisualOberon mailing list. Please see
+
+http://www.sourceforge.net/projects/visualoberon
+
+for more information about accessing the mailing list.
+
+If in doubt or have problems with the mailinglist write
+to mailto:tim@teulings.org.
+
+
+Preferences setting
+-------------------
+
+If you want to change the look and the behaviour of the used objects
+you can use the VisualPrefs program, which will also be compiled while
+creating the tools.
+
+You can then start the VisualPrefs program, make your changes and
+save them. This will result in  human readable file within the
+.VisualOberon directory.
+
+The used colors and fonts (and some other settings) cannot be changed from
+within VisualPrefs because VisualOberon does not yet support color and
+font selectors. You have to edit the "Display"-files in your
+".VisualOberon" directory by hand after storing the settings to create
+them.
+
+
+What is the function of the different modules?
+----------------------------------------------
+
+See the supplied texinfo/info/dvi documentation for more information
+about each module and a general cross reference of the classes
+and methods supplied by VO.
+
+
+Where to start investigating the source?
+----------------------------------------
+
+Starting point for an in-to-deep lecture of the current sources of VO
+are the three main modules "VO:Object", "VO:Base:Object", "VO:
+Base:Display" and VO:OS:Display.
+
+I have tried to comment them as fully as possible. However, if there are
+any questions I will give you as much help as possible. For people who want
+to write their own objects, I've also put a number of comments in
+"VO:Button", so take a look at it, too. Use the suplied docmentation in the
+"docs" subdiretcory for a detail description of VisualOberon and its
+concepts. It also contains automatically generated crossreferences
+for the sources.
+
+
+I want to help, what can I do?
+------------------------------
+
+Read ABOUT in the same directory and the documentation given in
+various formats. It should answer all your questions. However if there
+are still unanswered questions, mail me or subscribe to the mailinglist.
+
+
+Copyright?
+----------
+
+The VisualOberon library itself is under the GNU LIBRARY GENERAL PUBLIC
+LICENSE if not otherwise stated. Read the file COPYING.LIB for more
+information.
+
+The rest of the package - exspecially the various demo programs - is, if not
+otherwise stated under the GNU GENERAL PUBLIC LICENSE. Read the file COPYING
+that comes with this package for more information.

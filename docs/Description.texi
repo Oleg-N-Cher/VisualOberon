@@ -1,0 +1,17 @@
+\input texinfo @c -*- texinfo -*-
+@c %**start of header
+@setfilename Description.info
+@settitle Description
+@iftex
+@afourpaper
+@end iftex
+@c %**end of header
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+@node Top
+@top
+
+@include About.texi
+
+@bye

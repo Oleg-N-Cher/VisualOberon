@@ -1,0 +1,20 @@
+\input texinfo @c -*- texinfo -*-
+@c %**start of header
+@setfilename Announce.info
+@settitle Announce of VisualOberon
+@iftex
+@afourpaper
+@end iftex
+@c %**end of header
+
+@comment -------------------------------------------------------------------
+@comment -------------------------------------------------------------------
+@node Top
+@top
+
+@center -- This is an announcement of the VisualOberon project --
+@center ----------------------------------------------------------
+
+@include About.texi
+
+@bye
