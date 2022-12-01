@@ -1,0 +1,3 @@
+/target/win32/*.a
+/target/win64/*.a
+

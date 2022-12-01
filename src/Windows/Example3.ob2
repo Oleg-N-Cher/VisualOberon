@@ -7,9 +7,9 @@
 ** - Stewart Greenhill
 *)
 
-MODULE Example3 [OOC_EXTENSIONS];
+MODULE Example3 (*OOC_EXTENSIONS*);
 
-IMPORT W := Windows, S := SYSTEM, Out, LongStrings;
+IMPORT W := Windows, S := SYSTEM, Out := Console, LongStrings;
 
 CONST
   className = "Example2Class";

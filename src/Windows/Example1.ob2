@@ -1,6 +1,6 @@
 MODULE Example1;
 
-IMPORT W := Windows, S := SYSTEM, Out;
+IMPORT W := Windows, S := SYSTEM, Out := Console;
 
 PROCEDURE TestMessage;
 VAR

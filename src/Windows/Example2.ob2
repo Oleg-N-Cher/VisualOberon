@@ -7,9 +7,9 @@
 ** - Stewart Greenhill
 *)
 
-MODULE Example2 [OOC_EXTENSIONS];
+MODULE Example2 (*OOC_EXTENSIONS*);
 
-IMPORT W := Windows, S := SYSTEM, Out, Strings;
+IMPORT W := Windows, S := SYSTEM, Out := Console, Strings;
 
 CONST
   className = "Example2Class";
@@ -34,7 +34,7 @@ VAR
 ** StdCall (pascal) calling conventions are used. 
 *)
 
-PROCEDURE MessageHandler ["Pascal"] (wnd : W.HWND; msg : W.UINT; wParam : W.WPARAM; lParam : W.LPARAM) : W.LRESULT;
+PROCEDURE [stdcall] MessageHandler (wnd : W.HWND; msg : W.UINT; wParam : W.WPARAM; lParam : W.LPARAM) : W.LRESULT;
 VAR
   dc : W.HDC;
   ps : W.PAINTSTRUCT;
