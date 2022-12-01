@@ -1,5 +1,6 @@
 (* 	$Id: LongStrings.Mod,v 1.1 2002/05/27 22:02:04 mva Exp $	 *)
 MODULE LongStrings;
+IMPORT SYSTEM;
 (*  Facilities for manipulating strings in LONGCHAR arrays.
     Copyright (C) 1996, 1997  Michael van Acken
 
@@ -37,6 +38,8 @@ default it is installed @emph{without} index checks.
 
 
 TYPE
+  LONGCHAR = SYSTEM.CHAR16;
+
   CompareResults* = SHORTINT;
   (**Result type of @oproc{Compare}.  *)
   
@@ -526,8 +529,16 @@ PROCEDURE Long* (source: ARRAY OF CHAR; VAR destination: ARRAY OF LONGCHAR);
 (**Copies @oparam{source} to @oparam{destination}, extending CHAR values to
    LONGCHAR on the way.  Equivalent to the predefined procedure @samp{COPY}.
    Unlike @samp{COPY}, this procedure can be assigned to a procedure variable.  *)
+  VAR
+    i, len: INTEGER;
   BEGIN
-    COPY (source, destination)
+    len := SHORT (LEN (destination)-1);
+    i := 0;
+    WHILE (source[i] # 0X) & (i # len) DO
+      destination[i] := source[i];
+      INC (i)
+    END;
+    destination[i] := 0X
   END Long;
 
 PROCEDURE Short* (source: ARRAY OF LONGCHAR; repl: CHAR; VAR destination: ARRAY OF CHAR);
