@@ -8078,6 +8078,8 @@ CONST
     (* H2O: Defined Type Names *)
 
 TYPE
+    LONGCHAR = SYSTEM.CHAR16;
+
     wstring* = POINTER TO ARRAY OF LONGCHAR;
 
     EXCEPTION_DISPOSITION* = INTEGER (* enumerated type _EXCEPTION_DISPOSITION *);
@@ -8220,7 +8222,7 @@ TYPE
 
     LONG* = LONGINT;
 
-    WCHAR* = SYSTEM.CHAR16;
+    WCHAR* = LONGCHAR;
 
     PWCHAR* = POINTER (*CSTRING*) TO ARRAY [notag] OF WCHAR;
 
@@ -8323,7 +8325,7 @@ TYPE
 
     USN* = LONGLONG;
 
-    _LARGE_INTEGER_union* = RECORD [UNION]
+    _LARGE_INTEGER_union* = RECORD [union]
       noname0* : RECORD [notag]
         LowPart* : DWORD;
         HighPart* : LONG
@@ -8339,7 +8341,7 @@ TYPE
 
     PLARGE_INTEGER* = POINTER TO LARGE_INTEGER;
 
-    _ULARGE_INTEGER_union* = RECORD [UNION]
+    _ULARGE_INTEGER_union* = RECORD [union]
       noname0* : RECORD [notag]
         LowPart* : DWORD;
         HighPart* : DWORD
@@ -8427,7 +8429,7 @@ TYPE
 
     PFLOATING_SAVE_AREA* = POINTER TO FLOATING_SAVE_AREA;
 
-    _CONTEXT_struct* = RECORD [ALIGN8]
+    _CONTEXT_struct* = RECORD [align8]
       ContextFlags* : DWORD;
       Dr0* : DWORD;
       Dr1* : DWORD;
@@ -8462,7 +8464,7 @@ TYPE
     _LDT_ENTRY_struct* = RECORD [notag]
       LimitLow* : WORD;
       BaseLow* : WORD;
-      HighWord* : RECORD [UNION]
+      HighWord* : RECORD [union]
         Bytes* : RECORD [notag]
           BaseMid* : BYTE;
           Flags1* : BYTE;
@@ -8490,7 +8492,7 @@ TYPE
 
     AutoPtr__EXCEPTION_RECORD* = POINTER TO _EXCEPTION_RECORD_struct;
 
-    _EXCEPTION_RECORD_struct* = RECORD [ALIGN8]
+    _EXCEPTION_RECORD_struct* = RECORD [align8]
       ExceptionCode* : DWORD;
       ExceptionFlags* : DWORD;
       ExceptionRecord* : AutoPtr__EXCEPTION_RECORD;
@@ -8533,7 +8535,7 @@ TYPE
 
     PGENERIC_MAPPING* = POINTER TO GENERIC_MAPPING;
 
-    _LUID_AND_ATTRIBUTES_struct* = RECORD [ALIGN4]
+    _LUID_AND_ATTRIBUTES_struct* = RECORD [align4]
       Luid* : LUID;
       Attributes* : DWORD
     END;
@@ -8908,7 +8910,7 @@ TYPE
       StackBase* : PVOID;
       StackLimit* : PVOID;
       SubSystemTib* : PVOID;
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         FiberData* : PVOID;
         Version* : DWORD
       END;
@@ -9027,11 +9029,11 @@ TYPE
     PMEMORY_BASIC_INFORMATION* = POINTER TO _MEMORY_BASIC_INFORMATION_struct;
 
     _MEMORY_BASIC_INFORMATION_VLM_struct* = RECORD [notag]
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         BaseAddress* : PVOID64;
         BaseAddressAsUlongLong* : ULONGLONG
       END;
-      noname1* : RECORD [UNION]
+      noname1* : RECORD [union]
         AllocationBase* : PVOID64;
         AllocationBaseAsUlongLong* : ULONGLONG
       END;
@@ -9057,7 +9059,7 @@ TYPE
 
     PFILE_NOTIFY_INFORMATION* = POINTER TO _FILE_NOTIFY_INFORMATION_struct;
 
-    _FILE_SEGMENT_ELEMENT_union* = RECORD [UNION]
+    _FILE_SEGMENT_ELEMENT_union* = RECORD [union]
       Buffer* : PVOID64;
       Alignment* : ULONGLONG
     END;
@@ -9070,7 +9072,7 @@ TYPE
       ReparseTag* : DWORD;
       ReparseDataLength* : WORD;
       Reserved* : WORD;
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         SymbolicLinkReparseBuffer* : RECORD [notag]
           SubstituteNameOffset* : WORD;
           SubstituteNameLength* : WORD;
@@ -9131,7 +9133,7 @@ TYPE
 
     PPOWER_DEVICE_TIMEOUTS* = POINTER TO _POWER_DEVICE_TIMEOUTS_struct;
 
-    _IMAGE_DOS_HEADER_struct* = RECORD [ALIGN2]
+    _IMAGE_DOS_HEADER_struct* = RECORD [align2]
       e_magic* : WORD;
       e_cblp* : WORD;
       e_cp* : WORD;
@@ -9157,7 +9159,7 @@ TYPE
 
     PIMAGE_DOS_HEADER* = POINTER TO _IMAGE_DOS_HEADER_struct;
 
-    _IMAGE_OS2_HEADER_struct* = RECORD [ALIGN2]
+    _IMAGE_OS2_HEADER_struct* = RECORD [align2]
       ne_magic* : WORD;
       ne_ver* : CHAR;
       ne_rev* : CHAR;
@@ -9194,7 +9196,7 @@ TYPE
 
     PIMAGE_OS2_HEADER* = POINTER TO _IMAGE_OS2_HEADER_struct;
 
-    _IMAGE_VXD_HEADER_struct* = RECORD [ALIGN2]
+    _IMAGE_VXD_HEADER_struct* = RECORD [align2]
       e32_magic* : WORD;
       e32_border* : BYTE;
       e32_worder* : BYTE;
@@ -9252,7 +9254,7 @@ TYPE
 
     PIMAGE_VXD_HEADER* = POINTER TO _IMAGE_VXD_HEADER_struct;
 
-    _IMAGE_FILE_HEADER_struct* = RECORD [ALIGN4]
+    _IMAGE_FILE_HEADER_struct* = RECORD [align4]
       Machine* : WORD;
       NumberOfSections* : WORD;
       TimeDateStamp* : DWORD;
@@ -9266,7 +9268,7 @@ TYPE
 
     PIMAGE_FILE_HEADER* = POINTER TO _IMAGE_FILE_HEADER_struct;
 
-    _IMAGE_DATA_DIRECTORY_struct* = RECORD [ALIGN4]
+    _IMAGE_DATA_DIRECTORY_struct* = RECORD [align4]
       VirtualAddress* : DWORD;
       Size* : DWORD
     END;
@@ -9275,7 +9277,7 @@ TYPE
 
     PIMAGE_DATA_DIRECTORY* = POINTER TO _IMAGE_DATA_DIRECTORY_struct;
 
-    _IMAGE_OPTIONAL_HEADER_struct* = RECORD [ALIGN4]
+    _IMAGE_OPTIONAL_HEADER_struct* = RECORD [align4]
       Magic* : WORD;
       MajorLinkerVersion* : BYTE;
       MinorLinkerVersion* : BYTE;
@@ -9313,7 +9315,7 @@ TYPE
 
     PIMAGE_OPTIONAL_HEADER32* = POINTER TO _IMAGE_OPTIONAL_HEADER_struct;
 
-    _IMAGE_ROM_OPTIONAL_HEADER_struct* = RECORD [ALIGN4]
+    _IMAGE_ROM_OPTIONAL_HEADER_struct* = RECORD [align4]
       Magic* : WORD;
       MajorLinkerVersion* : BYTE;
       MinorLinkerVersion* : BYTE;
@@ -9333,7 +9335,7 @@ TYPE
 
     PIMAGE_ROM_OPTIONAL_HEADER* = POINTER TO _IMAGE_ROM_OPTIONAL_HEADER_struct;
 
-    _IMAGE_OPTIONAL_HEADER64_struct* = RECORD [ALIGN4]
+    _IMAGE_OPTIONAL_HEADER64_struct* = RECORD [align4]
       Magic* : WORD;
       MajorLinkerVersion* : BYTE;
       MinorLinkerVersion* : BYTE;
@@ -9374,7 +9376,7 @@ TYPE
 
     PIMAGE_OPTIONAL_HEADER* = PIMAGE_OPTIONAL_HEADER32;
 
-    _IMAGE_NT_HEADERS64_struct* = RECORD [ALIGN4]
+    _IMAGE_NT_HEADERS64_struct* = RECORD [align4]
       Signature* : DWORD;
       FileHeader* : IMAGE_FILE_HEADER;
       OptionalHeader* : IMAGE_OPTIONAL_HEADER64
@@ -9384,7 +9386,7 @@ TYPE
 
     PIMAGE_NT_HEADERS64* = POINTER TO _IMAGE_NT_HEADERS64_struct;
 
-    _IMAGE_NT_HEADERS_struct* = RECORD [ALIGN4]
+    _IMAGE_NT_HEADERS_struct* = RECORD [align4]
       Signature* : DWORD;
       FileHeader* : IMAGE_FILE_HEADER;
       OptionalHeader* : IMAGE_OPTIONAL_HEADER32
@@ -9394,7 +9396,7 @@ TYPE
 
     PIMAGE_NT_HEADERS32* = POINTER TO _IMAGE_NT_HEADERS_struct;
 
-    _IMAGE_ROM_HEADERS_struct* = RECORD [ALIGN4]
+    _IMAGE_ROM_HEADERS_struct* = RECORD [align4]
       FileHeader* : IMAGE_FILE_HEADER;
       OptionalHeader* : IMAGE_ROM_OPTIONAL_HEADER
     END;
@@ -9407,9 +9409,9 @@ TYPE
 
     PIMAGE_NT_HEADERS* = PIMAGE_NT_HEADERS32;
 
-    _IMAGE_SECTION_HEADER_struct* = RECORD [ALIGN4]
+    _IMAGE_SECTION_HEADER_struct* = RECORD [align4]
       Name* : ARRAY 8 OF BYTE;
-      Misc* : RECORD [UNION]
+      Misc* : RECORD [union]
         PhysicalAddress* : DWORD;
         VirtualSize* : DWORD
       END;
@@ -9427,10 +9429,10 @@ TYPE
 
     PIMAGE_SECTION_HEADER* = POINTER TO _IMAGE_SECTION_HEADER_struct;
 
-    _IMAGE_SYMBOL_struct* = RECORD [ALIGN2]
-      N* : RECORD [UNION]
+    _IMAGE_SYMBOL_struct* = RECORD [align2]
+      N* : RECORD [union]
         ShortName* : ARRAY 8 OF BYTE;
-        Name* : RECORD [ALIGN2]
+        Name* : RECORD [align2]
           Short* : DWORD;
           Long* : DWORD
         END;
@@ -9447,31 +9449,31 @@ TYPE
 
     PIMAGE_SYMBOL* = POINTER TO IMAGE_SYMBOL;
 
-    _IMAGE_AUX_SYMBOL_union* = RECORD [UNION]
-      Sym* : RECORD [ALIGN2]
+    _IMAGE_AUX_SYMBOL_union* = RECORD [union]
+      Sym* : RECORD [align2]
         TagIndex* : DWORD;
-        Misc* : RECORD [UNION]
-          LnSz* : RECORD [ALIGN2]
+        Misc* : RECORD [union]
+          LnSz* : RECORD [align2]
             Linenumber* : WORD;
             Size* : WORD
           END;
           TotalSize* : DWORD
         END;
-        FcnAry* : RECORD [UNION]
-          Function* : RECORD [ALIGN2]
+        FcnAry* : RECORD [union]
+          Function* : RECORD [align2]
             PointerToLinenumber* : DWORD;
             PointerToNextFunction* : DWORD
           END;
-          Array* : RECORD [ALIGN2]
+          Array* : RECORD [align2]
             Dimension* : ARRAY 4 OF WORD
           END
         END;
         TvIndex* : WORD
       END;
-      File* : RECORD [ALIGN2]
+      File* : RECORD [align2]
         Name* : ARRAY 18 OF BYTE
       END;
-      Section* : RECORD [ALIGN2]
+      Section* : RECORD [align2]
         Length* : DWORD;
         NumberOfRelocations* : WORD;
         NumberOfLinenumbers* : WORD;
@@ -9485,8 +9487,8 @@ TYPE
 
     PIMAGE_AUX_SYMBOL* = POINTER TO IMAGE_AUX_SYMBOL;
 
-    _IMAGE_RELOCATION_struct* = RECORD [ALIGN2]
-      noname0* : RECORD [UNION]
+    _IMAGE_RELOCATION_struct* = RECORD [align2]
+      noname0* : RECORD [union]
         VirtualAddress* : DWORD;
         RelocCount* : DWORD
       END;
@@ -9498,8 +9500,8 @@ TYPE
 
     PIMAGE_RELOCATION* = POINTER TO IMAGE_RELOCATION;
 
-    _IMAGE_LINENUMBER_struct* = RECORD [ALIGN2]
-      Type* : RECORD [UNION]
+    _IMAGE_LINENUMBER_struct* = RECORD [align2]
+      Type* : RECORD [union]
         SymbolTableIndex* : DWORD;
         VirtualAddress* : DWORD
       END;
@@ -9510,7 +9512,7 @@ TYPE
 
     PIMAGE_LINENUMBER* = POINTER TO IMAGE_LINENUMBER;
 
-    _IMAGE_BASE_RELOCATION_struct* = RECORD [ALIGN4]
+    _IMAGE_BASE_RELOCATION_struct* = RECORD [align4]
       VirtualAddress* : DWORD;
       SizeOfBlock* : DWORD
     END;
@@ -9519,7 +9521,7 @@ TYPE
 
     PIMAGE_BASE_RELOCATION* = POINTER TO IMAGE_BASE_RELOCATION;
 
-    _IMAGE_ARCHIVE_MEMBER_HEADER_struct* = RECORD [ALIGN4]
+    _IMAGE_ARCHIVE_MEMBER_HEADER_struct* = RECORD [align4]
       Name* : ARRAY 16 OF BYTE;
       Date* : ARRAY 12 OF BYTE;
       UserID* : ARRAY 6 OF BYTE;
@@ -9533,7 +9535,7 @@ TYPE
 
     PIMAGE_ARCHIVE_MEMBER_HEADER* = POINTER TO _IMAGE_ARCHIVE_MEMBER_HEADER_struct;
 
-    _IMAGE_EXPORT_DIRECTORY_struct* = RECORD [ALIGN4]
+    _IMAGE_EXPORT_DIRECTORY_struct* = RECORD [align4]
       Characteristics* : DWORD;
       TimeDateStamp* : DWORD;
       MajorVersion* : WORD;
@@ -9551,7 +9553,7 @@ TYPE
 
     PIMAGE_EXPORT_DIRECTORY* = POINTER TO _IMAGE_EXPORT_DIRECTORY_struct;
 
-    _IMAGE_IMPORT_BY_NAME_struct* = RECORD [ALIGN4]
+    _IMAGE_IMPORT_BY_NAME_struct* = RECORD [align4]
       Hint* : WORD;
       Name* : ARRAY 1 OF BYTE
     END;
@@ -9560,8 +9562,8 @@ TYPE
 
     PIMAGE_IMPORT_BY_NAME* = POINTER TO _IMAGE_IMPORT_BY_NAME_struct;
 
-    _IMAGE_THUNK_DATA64_struct* = RECORD [ALIGN8]
-      u1* : RECORD [UNION]
+    _IMAGE_THUNK_DATA64_struct* = RECORD [align8]
+      u1* : RECORD [union]
         ForwarderString* : PBYTE;
         Function* : PDWORD;
         Ordinal* : ULONGLONG;
@@ -9573,8 +9575,8 @@ TYPE
 
     PIMAGE_THUNK_DATA64* = POINTER TO IMAGE_THUNK_DATA64;
 
-    _IMAGE_THUNK_DATA32_struct* = RECORD [ALIGN4]
-      u1* : RECORD [UNION]
+    _IMAGE_THUNK_DATA32_struct* = RECORD [align4]
+      u1* : RECORD [union]
         ForwarderString* : PBYTE;
         Function* : PDWORD;
         Ordinal* : DWORD;
@@ -9588,7 +9590,7 @@ TYPE
 
     PIMAGE_TLS_CALLBACK* = PROCEDURE (DllHandle : PVOID; Reason : DWORD; Reserved : PVOID);
 
-    _IMAGE_TLS_DIRECTORY64_struct* = RECORD [ALIGN4]
+    _IMAGE_TLS_DIRECTORY64_struct* = RECORD [align4]
       StartAddressOfRawData* : ULONGLONG;
       EndAddressOfRawData* : ULONGLONG;
       AddressOfIndex* : PDWORD;
@@ -9601,7 +9603,7 @@ TYPE
 
     PIMAGE_TLS_DIRECTORY64* = POINTER TO IMAGE_TLS_DIRECTORY64;
 
-    _IMAGE_TLS_DIRECTORY32_struct* = RECORD [ALIGN4]
+    _IMAGE_TLS_DIRECTORY32_struct* = RECORD [align4]
       StartAddressOfRawData* : DWORD;
       EndAddressOfRawData* : DWORD;
       AddressOfIndex* : PDWORD;
@@ -9622,8 +9624,8 @@ TYPE
 
     PIMAGE_TLS_DIRECTORY* = PIMAGE_TLS_DIRECTORY32;
 
-    _IMAGE_IMPORT_DESCRIPTOR_struct* = RECORD [ALIGN4]
-      noname0* : RECORD [UNION]
+    _IMAGE_IMPORT_DESCRIPTOR_struct* = RECORD [align4]
+      noname0* : RECORD [union]
         Characteristics* : DWORD;
         OriginalFirstThunk* : DWORD
       END;
@@ -9637,7 +9639,7 @@ TYPE
 
     PIMAGE_IMPORT_DESCRIPTOR* = POINTER TO IMAGE_IMPORT_DESCRIPTOR;
 
-    _IMAGE_BOUND_IMPORT_DESCRIPTOR_struct* = RECORD [ALIGN4]
+    _IMAGE_BOUND_IMPORT_DESCRIPTOR_struct* = RECORD [align4]
       TimeDateStamp* : DWORD;
       OffsetModuleName* : WORD;
       NumberOfModuleForwarderRefs* : WORD
@@ -9647,7 +9649,7 @@ TYPE
 
     PIMAGE_BOUND_IMPORT_DESCRIPTOR* = POINTER TO _IMAGE_BOUND_IMPORT_DESCRIPTOR_struct;
 
-    _IMAGE_BOUND_FORWARDER_REF_struct* = RECORD [ALIGN4]
+    _IMAGE_BOUND_FORWARDER_REF_struct* = RECORD [align4]
       TimeDateStamp* : DWORD;
       OffsetModuleName* : WORD;
       Reserved* : WORD
@@ -9657,7 +9659,7 @@ TYPE
 
     PIMAGE_BOUND_FORWARDER_REF* = POINTER TO _IMAGE_BOUND_FORWARDER_REF_struct;
 
-    _IMAGE_STUB_DIRECTORY_struct* = RECORD [ALIGN4]
+    _IMAGE_STUB_DIRECTORY_struct* = RECORD [align4]
       SecondaryImportAddressTable* : DWORD;
       ExpectedISA* : ARRAY 2 OF WORD;
       StubAddressTable* : ARRAY 2 OF DWORD
@@ -9667,7 +9669,7 @@ TYPE
 
     PIMAGE_STUB_DIRECTORY* = POINTER TO _IMAGE_STUB_DIRECTORY_struct;
 
-    _IMAGE_RESOURCE_DIRECTORY_struct* = RECORD [ALIGN4]
+    _IMAGE_RESOURCE_DIRECTORY_struct* = RECORD [align4]
       Characteristics* : DWORD;
       TimeDateStamp* : DWORD;
       MajorVersion* : WORD;
@@ -9680,18 +9682,18 @@ TYPE
 
     PIMAGE_RESOURCE_DIRECTORY* = POINTER TO _IMAGE_RESOURCE_DIRECTORY_struct;
 
-    _IMAGE_RESOURCE_DIRECTORY_ENTRY_struct* = RECORD [ALIGN4]
-      noname0* : RECORD [UNION]
-        noname0* : RECORD [ALIGN4]
+    _IMAGE_RESOURCE_DIRECTORY_ENTRY_struct* = RECORD [align4]
+      noname0* : RECORD [union]
+        noname0* : RECORD [align4]
           NameOffset* : DWORD;
           NameIsString* : DWORD
         END;
         Name* : DWORD;
         Id* : WORD
       END;
-      noname1* : RECORD [UNION]
+      noname1* : RECORD [union]
         OffsetToData* : DWORD;
-        noname0* : RECORD [ALIGN4]
+        noname0* : RECORD [align4]
           OffsetToDirectory* : DWORD;
           DataIsDirectory* : DWORD
         END
@@ -9702,7 +9704,7 @@ TYPE
 
     PIMAGE_RESOURCE_DIRECTORY_ENTRY* = POINTER TO _IMAGE_RESOURCE_DIRECTORY_ENTRY_struct;
 
-    _IMAGE_RESOURCE_DIRECTORY_STRING_struct* = RECORD [ALIGN4]
+    _IMAGE_RESOURCE_DIRECTORY_STRING_struct* = RECORD [align4]
       Length* : WORD;
       NameString* : ARRAY 1 OF CHAR
     END;
@@ -9711,7 +9713,7 @@ TYPE
 
     PIMAGE_RESOURCE_DIRECTORY_STRING* = POINTER TO _IMAGE_RESOURCE_DIRECTORY_STRING_struct;
 
-    _IMAGE_RESOURCE_DIR_STRING_U_struct* = RECORD [ALIGN4]
+    _IMAGE_RESOURCE_DIR_STRING_U_struct* = RECORD [align4]
       Length* : WORD;
       NameString* : ARRAY 1 OF WCHAR
     END;
@@ -9720,7 +9722,7 @@ TYPE
 
     PIMAGE_RESOURCE_DIR_STRING_U* = POINTER TO _IMAGE_RESOURCE_DIR_STRING_U_struct;
 
-    _IMAGE_RESOURCE_DATA_ENTRY_struct* = RECORD [ALIGN4]
+    _IMAGE_RESOURCE_DATA_ENTRY_struct* = RECORD [align4]
       OffsetToData* : DWORD;
       Size* : DWORD;
       CodePage* : DWORD;
@@ -9731,7 +9733,7 @@ TYPE
 
     PIMAGE_RESOURCE_DATA_ENTRY* = POINTER TO _IMAGE_RESOURCE_DATA_ENTRY_struct;
 
-    _IMAGE_LOAD_CONFIG_DIRECTORY_struct* = RECORD [ALIGN4]
+    _IMAGE_LOAD_CONFIG_DIRECTORY_struct* = RECORD [align4]
       Characteristics* : DWORD;
       TimeDateStamp* : DWORD;
       MajorVersion* : WORD;
@@ -9756,7 +9758,7 @@ TYPE
 
     PIMAGE_LOAD_CONFIG_DIRECTORY* = POINTER TO _IMAGE_LOAD_CONFIG_DIRECTORY_struct;
 
-    _IMAGE_IA64_RUNTIME_FUNCTION_ENTRY_struct* = RECORD [ALIGN4]
+    _IMAGE_IA64_RUNTIME_FUNCTION_ENTRY_struct* = RECORD [align4]
       BeginAddress* : DWORD;
       EndAddress* : DWORD;
       UnwindInfoAddress* : DWORD
@@ -9766,7 +9768,7 @@ TYPE
 
     PIMAGE_IA64_RUNTIME_FUNCTION_ENTRY* = POINTER TO _IMAGE_IA64_RUNTIME_FUNCTION_ENTRY_struct;
 
-    _IMAGE_ALPHA_RUNTIME_FUNCTION_ENTRY_struct* = RECORD [ALIGN4]
+    _IMAGE_ALPHA_RUNTIME_FUNCTION_ENTRY_struct* = RECORD [align4]
       BeginAddress* : DWORD;
       EndAddress* : DWORD;
       ExceptionHandler* : DWORD;
@@ -9778,7 +9780,7 @@ TYPE
 
     PIMAGE_ALPHA_RUNTIME_FUNCTION_ENTRY* = POINTER TO _IMAGE_ALPHA_RUNTIME_FUNCTION_ENTRY_struct;
 
-    _IMAGE_ALPHA64_RUNTIME_FUNCTION_ENTRY_struct* = RECORD [ALIGN4]
+    _IMAGE_ALPHA64_RUNTIME_FUNCTION_ENTRY_struct* = RECORD [align4]
       BeginAddress* : ULONGLONG;
       EndAddress* : ULONGLONG;
       ExceptionHandler* : ULONGLONG;
@@ -9794,7 +9796,7 @@ TYPE
 
     PIMAGE_AXP64_RUNTIME_FUNCTION_ENTRY* = PIMAGE_ALPHA64_RUNTIME_FUNCTION_ENTRY;
 
-    _IMAGE_CE_RUNTIME_FUNCTION_ENTRY_struct* = RECORD [ALIGN4]
+    _IMAGE_CE_RUNTIME_FUNCTION_ENTRY_struct* = RECORD [align4]
       FuncStart* : DWORD;
       PrologLen* : DWORD;
       FuncLen* : DWORD;
@@ -9810,7 +9812,7 @@ TYPE
 
     PIMAGE_RUNTIME_FUNCTION_ENTRY* = PIMAGE_ALPHA_RUNTIME_FUNCTION_ENTRY;
 
-    _IMAGE_DEBUG_DIRECTORY_struct* = RECORD [ALIGN4]
+    _IMAGE_DEBUG_DIRECTORY_struct* = RECORD [align4]
       Characteristics* : DWORD;
       TimeDateStamp* : DWORD;
       MajorVersion* : WORD;
@@ -9825,7 +9827,7 @@ TYPE
 
     PIMAGE_DEBUG_DIRECTORY* = POINTER TO _IMAGE_DEBUG_DIRECTORY_struct;
 
-    _IMAGE_COFF_SYMBOLS_HEADER_struct* = RECORD [ALIGN4]
+    _IMAGE_COFF_SYMBOLS_HEADER_struct* = RECORD [align4]
       NumberOfSymbols* : DWORD;
       LvaToFirstSymbol* : DWORD;
       NumberOfLinenumbers* : DWORD;
@@ -9840,7 +9842,7 @@ TYPE
 
     PIMAGE_COFF_SYMBOLS_HEADER* = POINTER TO _IMAGE_COFF_SYMBOLS_HEADER_struct;
 
-    _FPO_DATA_struct* = RECORD [ALIGN4]
+    _FPO_DATA_struct* = RECORD [align4]
       ulOffStart* : DWORD;
       cbProcSize* : DWORD;
       cdwLocals* : DWORD;
@@ -9857,7 +9859,7 @@ TYPE
 
     PFPO_DATA* = POINTER TO _FPO_DATA_struct;
 
-    _IMAGE_DEBUG_MISC_struct* = RECORD [ALIGN4]
+    _IMAGE_DEBUG_MISC_struct* = RECORD [align4]
       DataType* : DWORD;
       Length* : DWORD;
       Unicode* : BOOLEAN;
@@ -9869,7 +9871,7 @@ TYPE
 
     PIMAGE_DEBUG_MISC* = POINTER TO _IMAGE_DEBUG_MISC_struct;
 
-    _IMAGE_FUNCTION_ENTRY_struct* = RECORD [ALIGN4]
+    _IMAGE_FUNCTION_ENTRY_struct* = RECORD [align4]
       StartingAddress* : DWORD;
       EndingAddress* : DWORD;
       EndOfPrologue* : DWORD
@@ -9879,7 +9881,7 @@ TYPE
 
     PIMAGE_FUNCTION_ENTRY* = POINTER TO _IMAGE_FUNCTION_ENTRY_struct;
 
-    _IMAGE_FUNCTION_ENTRY64_struct* = RECORD [ALIGN4]
+    _IMAGE_FUNCTION_ENTRY64_struct* = RECORD [align4]
       StartingAddress* : ULONGLONG;
       EndingAddress* : ULONGLONG;
       EndOfPrologue* : ULONGLONG
@@ -9889,7 +9891,7 @@ TYPE
 
     PIMAGE_FUNCTION_ENTRY64* = POINTER TO _IMAGE_FUNCTION_ENTRY64_struct;
 
-    _IMAGE_SEPARATE_DEBUG_HEADER_struct* = RECORD [ALIGN4]
+    _IMAGE_SEPARATE_DEBUG_HEADER_struct* = RECORD [align4]
       Signature* : WORD;
       Flags* : WORD;
       Machine* : WORD;
@@ -9909,7 +9911,7 @@ TYPE
 
     PIMAGE_SEPARATE_DEBUG_HEADER* = POINTER TO _IMAGE_SEPARATE_DEBUG_HEADER_struct;
 
-    _ImageArchitectureHeader_struct* = RECORD [ALIGN4]
+    _ImageArchitectureHeader_struct* = RECORD [align4]
       AmaskValue* : LONGINT;
       noname0* : LONGINT;
       AmaskShift* : LONGINT;
@@ -9921,7 +9923,7 @@ TYPE
 
     PIMAGE_ARCHITECTURE_HEADER* = POINTER TO _ImageArchitectureHeader_struct;
 
-    _ImageArchitectureEntry_struct* = RECORD [ALIGN4]
+    _ImageArchitectureEntry_struct* = RECORD [align4]
       FixupInstRVA* : DWORD;
       NewInst* : DWORD
     END;
@@ -9937,7 +9939,7 @@ TYPE
       Machine* : WORD;
       TimeDateStamp* : DWORD;
       SizeOfData* : DWORD;
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         Ordinal* : WORD;
         Hint* : WORD
       END;
@@ -10535,7 +10537,7 @@ TYPE
     LPCOMMCONFIG* = POINTER TO _COMMCONFIG_struct;
 
     _SYSTEM_INFO_struct* = RECORD [notag]
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         dwOemId* : DWORD;
         noname0* : RECORD [notag]
           wProcessorArchitecture* : WORD;
@@ -10668,7 +10670,7 @@ TYPE
       dwDebugEventCode* : DWORD;
       dwProcessId* : DWORD;
       dwThreadId* : DWORD;
-      u* : RECORD [UNION]
+      u* : RECORD [union]
         Exception* : EXCEPTION_DEBUG_INFO;
         CreateThread* : CREATE_THREAD_DEBUG_INFO;
         CreateProcessInfo* : CREATE_PROCESS_DEBUG_INFO;
@@ -10712,7 +10714,7 @@ TYPE
       cbOverhead* : BYTE;
       iRegionIndex* : BYTE;
       wFlags* : WORD;
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         Block* : RECORD [notag]
           hMem* : HANDLE;
           dwReserved* : ARRAY 3 OF DWORD
@@ -11172,7 +11174,7 @@ TYPE
 
     LPBITMAP* = PBITMAP;
 
-    tagRGBTRIPLE_struct* = RECORD [ALIGN1]
+    tagRGBTRIPLE_struct* = RECORD [noalign]
       rgbtBlue* : BYTE;
       rgbtGreen* : BYTE;
       rgbtRed* : BYTE
@@ -11365,7 +11367,7 @@ TYPE
 
     PBITMAPCOREINFO* = LPBITMAPCOREINFO;
 
-    tagBITMAPFILEHEADER_struct* = RECORD [ALIGN2]
+    tagBITMAPFILEHEADER_struct* = RECORD [align2]
       bfType* : WORD;
       bfSize* : DWORD;
       bfReserved1* : WORD;
@@ -11449,7 +11451,7 @@ TYPE
 
     LPMETAFILEPICT* = POINTER TO tagMETAFILEPICT_struct;
 
-    tagMETAHEADER_struct* = RECORD [ALIGN2]
+    tagMETAHEADER_struct* = RECORD [align2]
       mtType* : WORD;
       mtHeaderSize* : WORD;
       mtVersion* : WORD;
@@ -11576,7 +11578,7 @@ TYPE
 
     LPTEXTMETRIC* = LPTEXTMETRICA;
 
-    tagNEWTEXTMETRICA_struct* = RECORD [ALIGN4]
+    tagNEWTEXTMETRICA_struct* = RECORD [align4]
       tmHeight* : LONG;
       tmAscent* : LONG;
       tmDescent* : LONG;
@@ -11611,7 +11613,7 @@ TYPE
 
     LPNEWTEXTMETRICA* = PNEWTEXTMETRICA;
 
-    tagNEWTEXTMETRICW_struct* = RECORD [ALIGN4]
+    tagNEWTEXTMETRICW_struct* = RECORD [align4]
       tmHeight* : LONG;
       tmAscent* : LONG;
       tmDescent* : LONG;
@@ -11949,7 +11951,7 @@ TYPE
       dmSize* : WORD;
       dmDriverExtra* : WORD;
       dmFields* : DWORD;
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         noname0* : RECORD [notag]
           dmOrientation* : INTEGER;
           dmPaperSize* : INTEGER;
@@ -11999,7 +12001,7 @@ TYPE
       dmSize* : WORD;
       dmDriverExtra* : WORD;
       dmFields* : DWORD;
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         noname0* : RECORD [notag]
           dmOrientation* : INTEGER;
           dmPaperSize* : INTEGER;
@@ -12273,14 +12275,14 @@ TYPE
 
     LPPOLYTEXT* = LPPOLYTEXTA;
 
-    _FIXED_struct* = RECORD [ALIGN2]
+    _FIXED_struct* = RECORD [align2]
       fract* : WORD;
       value* : INTEGER
     END;
 
     FIXED* = _FIXED_struct;
 
-    _MAT2_struct* = RECORD [ALIGN2]
+    _MAT2_struct* = RECORD [align2]
       eM11* : FIXED;
       eM12* : FIXED;
       eM21* : FIXED;
@@ -14134,7 +14136,7 @@ TYPE
 
     LPCOMPAREITEMSTRUCT* = PCOMPAREITEMSTRUCT;
 
-    DLGTEMPLATE* = RECORD [ALIGN2]
+    DLGTEMPLATE* = RECORD [align2]
       style* : DWORD;
       dwExtendedStyle* : DWORD;
       cdit* : WORD;
@@ -14156,7 +14158,7 @@ TYPE
 
     LPCDLGTEMPLATE* = LPCDLGTEMPLATEA;
 
-    DLGITEMTEMPLATE* = RECORD [ALIGN2]
+    DLGITEMTEMPLATE* = RECORD [align2]
       style* : DWORD;
       dwExtendedStyle* : DWORD;
       x* : INTEGER;
@@ -14925,7 +14927,7 @@ TYPE
       wRepeatCount* : WORD;
       wVirtualKeyCode* : WORD;
       wVirtualScanCode* : WORD;
-      uChar* : RECORD [UNION]
+      uChar* : RECORD [union]
         UnicodeChar* : WCHAR;
         AsciiChar* : CHAR
       END;
@@ -14973,7 +14975,7 @@ TYPE
 
     _INPUT_RECORD_struct* = RECORD [notag]
       EventType* : WORD;
-      Event* : RECORD [UNION]
+      Event* : RECORD [union]
         KeyEvent* : KEY_EVENT_RECORD;
         MouseEvent* : MOUSE_EVENT_RECORD;
         WindowBufferSizeEvent* : WINDOW_BUFFER_SIZE_RECORD;
@@ -14987,7 +14989,7 @@ TYPE
     PINPUT_RECORD* = POINTER TO _INPUT_RECORD_struct;
 
     _CHAR_INFO_struct* = RECORD [notag]
-      Char* : RECORD [UNION]
+      Char* : RECORD [union]
         UnicodeChar* : WCHAR;
         AsciiChar* : CHAR
       END;
@@ -15669,14 +15671,14 @@ TYPE
 
     MMRESULT* = UINT;
 
-    mmtime_tag_struct* = RECORD [ALIGN1]
+    mmtime_tag_struct* = RECORD [noalign]
       wType* : UINT;
-      u* : RECORD [UNION]
+      u* : RECORD [union]
         ms* : DWORD;
         sample* : DWORD;
         cb* : DWORD;
         ticks* : DWORD;
-        smpte* : RECORD [ALIGN1]
+        smpte* : RECORD [noalign]
           hour* : BYTE;
           noname0* : BYTE;
           sec* : BYTE;
@@ -15685,7 +15687,7 @@ TYPE
           dummy* : BYTE;
           pad* : ARRAY 2 OF BYTE
         END;
-        midi* : RECORD [ALIGN1]
+        midi* : RECORD [noalign]
           songptrpos* : DWORD
         END
       END
@@ -15701,7 +15703,7 @@ TYPE
 
     HDRVR* = HANDLE;
 
-    DRVCONFIGINFOEX_struct* = RECORD [ALIGN1]
+    DRVCONFIGINFOEX_struct* = RECORD [noalign]
       dwDCISize* : DWORD;
       lpszDCISectionName* : LPCWSTR;
       lpszDCIAliasName* : LPCWSTR;
@@ -15716,7 +15718,7 @@ TYPE
 
     LPDRVCONFIGINFOEX* = PDRVCONFIGINFOEX;
 
-    tagDRVCONFIGINFO_struct* = RECORD [ALIGN1]
+    tagDRVCONFIGINFO_struct* = RECORD [noalign]
       dwDCISize* : DWORD;
       lpszDCISectionName* : LPCWSTR;
       lpszDCIAliasName* : LPCWSTR
@@ -15750,7 +15752,7 @@ TYPE
 
     PWAVEHDR* = POINTER TO wavehdr_tag_struct;
 
-    wavehdr_tag_struct* = RECORD [ALIGN1]
+    wavehdr_tag_struct* = RECORD [noalign]
       lpData* : LPSTR;
       dwBufferLength* : DWORD;
       dwBytesRecorded* : DWORD;
@@ -15767,7 +15769,7 @@ TYPE
 
     LPWAVEHDR* = PWAVEHDR;
 
-    tagWAVEOUTCAPSA_struct* = RECORD [ALIGN1]
+    tagWAVEOUTCAPSA_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -15786,7 +15788,7 @@ TYPE
 
     LPWAVEOUTCAPSA* = PWAVEOUTCAPSA;
 
-    tagWAVEOUTCAPSW_struct* = RECORD [ALIGN1]
+    tagWAVEOUTCAPSW_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -15813,7 +15815,7 @@ TYPE
 
     LPWAVEOUTCAPS* = LPWAVEOUTCAPSA;
 
-    tagWAVEINCAPSA_struct* = RECORD [ALIGN1]
+    tagWAVEINCAPSA_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -15831,7 +15833,7 @@ TYPE
 
     LPWAVEINCAPSA* = PWAVEINCAPSA;
 
-    tagWAVEINCAPSW_struct* = RECORD [ALIGN1]
+    tagWAVEINCAPSW_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -15857,7 +15859,7 @@ TYPE
 
     LPWAVEINCAPS* = LPWAVEINCAPSA;
 
-    waveformat_tag_struct* = RECORD [ALIGN1]
+    waveformat_tag_struct* = RECORD [noalign]
       wFormatTag* : WORD;
       nChannels* : WORD;
       nSamplesPerSec* : DWORD;
@@ -15873,7 +15875,7 @@ TYPE
 
     LPWAVEFORMAT* = PWAVEFORMAT;
 
-    pcmwaveformat_tag_struct* = RECORD [ALIGN1]
+    pcmwaveformat_tag_struct* = RECORD [noalign]
       wf* : WAVEFORMAT;
       wBitsPerSample* : WORD
     END;
@@ -15886,7 +15888,7 @@ TYPE
 
     LPPCMWAVEFORMAT* = PPCMWAVEFORMAT;
 
-    tWAVEFORMATEX_struct* = RECORD [ALIGN1]
+    tWAVEFORMATEX_struct* = RECORD [noalign]
       wFormatTag* : WORD;
       nChannels* : WORD;
       nSamplesPerSec* : DWORD;
@@ -15932,7 +15934,7 @@ TYPE
 
     LPKEYARRAY* = PWORD;
 
-    tagMIDIOUTCAPSA_struct* = RECORD [ALIGN1]
+    tagMIDIOUTCAPSA_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -15952,7 +15954,7 @@ TYPE
 
     LPMIDIOUTCAPSA* = PMIDIOUTCAPSA;
 
-    tagMIDIOUTCAPSW_struct* = RECORD [ALIGN1]
+    tagMIDIOUTCAPSW_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -15980,7 +15982,7 @@ TYPE
 
     LPMIDIOUTCAPS* = LPMIDIOUTCAPSA;
 
-    tagMIDIINCAPSA_struct* = RECORD [ALIGN1]
+    tagMIDIINCAPSA_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -15996,7 +15998,7 @@ TYPE
 
     LPMIDIINCAPSA* = PMIDIINCAPSA;
 
-    tagMIDIINCAPSW_struct* = RECORD [ALIGN1]
+    tagMIDIINCAPSW_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -16022,7 +16024,7 @@ TYPE
 
     PMIDIHDR* = POINTER TO midihdr_tag_struct;
 
-    midihdr_tag_struct* = RECORD [ALIGN1]
+    midihdr_tag_struct* = RECORD [noalign]
       lpData* : LPSTR;
       dwBufferLength* : DWORD;
       dwBytesRecorded* : DWORD;
@@ -16040,7 +16042,7 @@ TYPE
 
     LPMIDIHDR* = PMIDIHDR;
 
-    midievent_tag_struct* = RECORD [ALIGN1]
+    midievent_tag_struct* = RECORD [noalign]
       dwDeltaTime* : DWORD;
       dwStreamID* : DWORD;
       dwEvent* : DWORD;
@@ -16049,7 +16051,7 @@ TYPE
 
     MIDIEVENT* = midievent_tag_struct;
 
-    midistrmbuffver_tag_struct* = RECORD [ALIGN1]
+    midistrmbuffver_tag_struct* = RECORD [noalign]
       dwVersion* : DWORD;
       dwMid* : DWORD;
       dwOEMVersion* : DWORD
@@ -16057,7 +16059,7 @@ TYPE
 
     MIDISTRMBUFFVER* = midistrmbuffver_tag_struct;
 
-    midiproptimediv_tag_struct* = RECORD [ALIGN1]
+    midiproptimediv_tag_struct* = RECORD [noalign]
       cbStruct* : DWORD;
       dwTimeDiv* : DWORD
     END;
@@ -16066,7 +16068,7 @@ TYPE
 
     LPMIDIPROPTIMEDIV* = POINTER TO midiproptimediv_tag_struct;
 
-    midiproptempo_tag_struct* = RECORD [ALIGN1]
+    midiproptempo_tag_struct* = RECORD [noalign]
       cbStruct* : DWORD;
       dwTempo* : DWORD
     END;
@@ -16075,7 +16077,7 @@ TYPE
 
     LPMIDIPROPTEMPO* = POINTER TO midiproptempo_tag_struct;
 
-    tagAUXCAPSA_struct* = RECORD [ALIGN1]
+    tagAUXCAPSA_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -16093,7 +16095,7 @@ TYPE
 
     LPAUXCAPSA* = PAUXCAPSA;
 
-    tagAUXCAPSW_struct* = RECORD [ALIGN1]
+    tagAUXCAPSW_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -16127,7 +16129,7 @@ TYPE
 
     LPHMIXER* = POINTER TO ARRAY OF HMIXER;
 
-    tagMIXERCAPSA_struct* = RECORD [ALIGN1]
+    tagMIXERCAPSA_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -16142,7 +16144,7 @@ TYPE
 
     LPMIXERCAPSA* = PMIXERCAPSA;
 
-    tagMIXERCAPSW_struct* = RECORD [ALIGN1]
+    tagMIXERCAPSW_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       vDriverVersion* : MMVERSION;
@@ -16163,7 +16165,7 @@ TYPE
 
     LPMIXERCAPS* = LPMIXERCAPSA;
 
-    tagMIXERLINEA_struct* = RECORD [ALIGN1]
+    tagMIXERLINEA_struct* = RECORD [noalign]
       cbStruct* : DWORD;
       dwDestination* : DWORD;
       dwSource* : DWORD;
@@ -16176,7 +16178,7 @@ TYPE
       cControls* : DWORD;
       szShortName* : ARRAY 16 OF CHAR;
       szName* : ARRAY 64 OF CHAR;
-      Target* : RECORD [ALIGN1]
+      Target* : RECORD [noalign]
         dwType* : DWORD;
         dwDeviceID* : DWORD;
         wMid* : WORD;
@@ -16192,7 +16194,7 @@ TYPE
 
     LPMIXERLINEA* = PMIXERLINEA;
 
-    tagMIXERLINEW_struct* = RECORD [ALIGN1]
+    tagMIXERLINEW_struct* = RECORD [noalign]
       cbStruct* : DWORD;
       dwDestination* : DWORD;
       dwSource* : DWORD;
@@ -16205,7 +16207,7 @@ TYPE
       cControls* : DWORD;
       szShortName* : ARRAY 16 OF WCHAR;
       szName* : ARRAY 64 OF WCHAR;
-      Target* : RECORD [ALIGN1]
+      Target* : RECORD [noalign]
         dwType* : DWORD;
         dwDeviceID* : DWORD;
         wMid* : WORD;
@@ -16227,7 +16229,7 @@ TYPE
 
     LPMIXERLINE* = LPMIXERLINEA;
 
-    tagMIXERCONTROLA_struct* = RECORD [ALIGN1]
+    tagMIXERCONTROLA_struct* = RECORD [noalign]
       cbStruct* : DWORD;
       dwControlID* : DWORD;
       dwControlType* : DWORD;
@@ -16235,18 +16237,18 @@ TYPE
       cMultipleItems* : DWORD;
       szShortName* : ARRAY 16 OF CHAR;
       szName* : ARRAY 64 OF CHAR;
-      Bounds* : RECORD [UNION]
-        noname0* : RECORD [ALIGN1]
+      Bounds* : RECORD [union]
+        noname0* : RECORD [noalign]
           lMinimum* : LONG;
           lMaximum* : LONG
         END;
-        noname1* : RECORD [ALIGN1]
+        noname1* : RECORD [noalign]
           dwMinimum* : DWORD;
           dwMaximum* : DWORD
         END;
         dwReserved* : ARRAY 6 OF DWORD
       END;
-      Metrics* : RECORD [UNION]
+      Metrics* : RECORD [union]
         cSteps* : DWORD;
         cbCustomData* : DWORD;
         dwReserved* : ARRAY 6 OF DWORD
@@ -16259,7 +16261,7 @@ TYPE
 
     LPMIXERCONTROLA* = PMIXERCONTROLA;
 
-    tagMIXERCONTROLW_struct* = RECORD [ALIGN1]
+    tagMIXERCONTROLW_struct* = RECORD [noalign]
       cbStruct* : DWORD;
       dwControlID* : DWORD;
       dwControlType* : DWORD;
@@ -16267,18 +16269,18 @@ TYPE
       cMultipleItems* : DWORD;
       szShortName* : ARRAY 16 OF WCHAR;
       szName* : ARRAY 64 OF WCHAR;
-      Bounds* : RECORD [UNION]
-        noname0* : RECORD [ALIGN1]
+      Bounds* : RECORD [union]
+        noname0* : RECORD [noalign]
           lMinimum* : LONG;
           lMaximum* : LONG
         END;
-        noname1* : RECORD [ALIGN1]
+        noname1* : RECORD [noalign]
           dwMinimum* : DWORD;
           dwMaximum* : DWORD
         END;
         dwReserved* : ARRAY 6 OF DWORD
       END;
-      Metrics* : RECORD [UNION]
+      Metrics* : RECORD [union]
         cSteps* : DWORD;
         cbCustomData* : DWORD;
         dwReserved* : ARRAY 6 OF DWORD
@@ -16297,10 +16299,10 @@ TYPE
 
     LPMIXERCONTROL* = LPMIXERCONTROLA;
 
-    tagMIXERLINECONTROLSA_struct* = RECORD [ALIGN1]
+    tagMIXERLINECONTROLSA_struct* = RECORD [noalign]
       cbStruct* : DWORD;
       dwLineID* : DWORD;
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         dwControlID* : DWORD;
         dwControlType* : DWORD
       END;
@@ -16315,10 +16317,10 @@ TYPE
 
     LPMIXERLINECONTROLSA* = PMIXERLINECONTROLSA;
 
-    tagMIXERLINECONTROLSW_struct* = RECORD [ALIGN1]
+    tagMIXERLINECONTROLSW_struct* = RECORD [noalign]
       cbStruct* : DWORD;
       dwLineID* : DWORD;
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         dwControlID* : DWORD;
         dwControlType* : DWORD
       END;
@@ -16339,11 +16341,11 @@ TYPE
 
     LPMIXERLINECONTROLS* = LPMIXERLINECONTROLSA;
 
-    tMIXERCONTROLDETAILS_struct* = RECORD [ALIGN1]
+    tMIXERCONTROLDETAILS_struct* = RECORD [noalign]
       cbStruct* : DWORD;
       dwControlID* : DWORD;
       cChannels* : DWORD;
-      noname0* : RECORD [UNION]
+      noname0* : RECORD [union]
         hwndOwner* : HWND;
         cMultipleItems* : DWORD
       END;
@@ -16357,7 +16359,7 @@ TYPE
 
     LPMIXERCONTROLDETAILS* = PMIXERCONTROLDETAILS;
 
-    tagMIXERCONTROLDETAILS_LISTTEXTA_struct* = RECORD [ALIGN1]
+    tagMIXERCONTROLDETAILS_LISTTEXTA_struct* = RECORD [noalign]
       dwParam1* : DWORD;
       dwParam2* : DWORD;
       szName* : ARRAY 64 OF CHAR
@@ -16369,7 +16371,7 @@ TYPE
 
     LPMIXERCONTROLDETAILS_LISTTEXTA* = PMIXERCONTROLDETAILS_LISTTEXTA;
 
-    tagMIXERCONTROLDETAILS_LISTTEXTW_struct* = RECORD [ALIGN1]
+    tagMIXERCONTROLDETAILS_LISTTEXTW_struct* = RECORD [noalign]
       dwParam1* : DWORD;
       dwParam2* : DWORD;
       szName* : ARRAY 64 OF WCHAR
@@ -16387,7 +16389,7 @@ TYPE
 
     LPMIXERCONTROLDETAILS_LISTTEXT* = LPMIXERCONTROLDETAILS_LISTTEXTA;
 
-    tMIXERCONTROLDETAILS_BOOLEAN_struct* = RECORD [ALIGN1]
+    tMIXERCONTROLDETAILS_BOOLEAN_struct* = RECORD [noalign]
       fValue* : LONG
     END;
 
@@ -16397,7 +16399,7 @@ TYPE
 
     LPMIXERCONTROLDETAILS_BOOLEAN* = PMIXERCONTROLDETAILS_BOOLEAN;
 
-    tMIXERCONTROLDETAILS_SIGNED_struct* = RECORD [ALIGN1]
+    tMIXERCONTROLDETAILS_SIGNED_struct* = RECORD [noalign]
       lValue* : LONG
     END;
 
@@ -16407,7 +16409,7 @@ TYPE
 
     LPMIXERCONTROLDETAILS_SIGNED* = PMIXERCONTROLDETAILS_SIGNED;
 
-    tMIXERCONTROLDETAILS_UNSIGNED_struct* = RECORD [ALIGN1]
+    tMIXERCONTROLDETAILS_UNSIGNED_struct* = RECORD [noalign]
       dwValue* : DWORD
     END;
 
@@ -16419,7 +16421,7 @@ TYPE
 
     LPTIMECALLBACK* = PROCEDURE (uTimerID : UINT; uMsg : UINT; dwUser : DWORD; dw1 : DWORD; dw2 : DWORD);
 
-    timecaps_tag_struct* = RECORD [ALIGN1]
+    timecaps_tag_struct* = RECORD [noalign]
       wPeriodMin* : UINT;
       wPeriodMax* : UINT
     END;
@@ -16432,7 +16434,7 @@ TYPE
 
     LPTIMECAPS* = PTIMECAPS;
 
-    tagJOYCAPSA_struct* = RECORD [ALIGN1]
+    tagJOYCAPSA_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       szPname* : ARRAY 32 OF CHAR;
@@ -16467,7 +16469,7 @@ TYPE
 
     LPJOYCAPSA* = PJOYCAPSA;
 
-    tagJOYCAPSW_struct* = RECORD [ALIGN1]
+    tagJOYCAPSW_struct* = RECORD [noalign]
       wMid* : WORD;
       wPid* : WORD;
       szPname* : ARRAY 32 OF WCHAR;
@@ -16510,7 +16512,7 @@ TYPE
 
     LPJOYCAPS* = LPJOYCAPSA;
 
-    joyinfo_tag_struct* = RECORD [ALIGN1]
+    joyinfo_tag_struct* = RECORD [noalign]
       wXpos* : UINT;
       wYpos* : UINT;
       wZpos* : UINT;
@@ -16525,7 +16527,7 @@ TYPE
 
     LPJOYINFO* = PJOYINFO;
 
-    joyinfoex_tag_struct* = RECORD [ALIGN1]
+    joyinfoex_tag_struct* = RECORD [noalign]
       dwSize* : DWORD;
       dwFlags* : DWORD;
       dwXpos* : DWORD;
@@ -16557,7 +16559,7 @@ TYPE
 
     LPMMIOPROC* = PROCEDURE (lpmmioinfo : LPSTR; uMsg : UINT; lParam1 : LPARAM; lParam2 : LPARAM) : LRESULT;
 
-    _MMIOINFO_struct* = RECORD [ALIGN1]
+    _MMIOINFO_struct* = RECORD [noalign]
       dwFlags* : DWORD;
       fccIOProc* : FOURCC;
       pIOProc* : LPMMIOPROC;
@@ -16586,7 +16588,7 @@ TYPE
 
     LPCMMIOINFO* = POINTER TO MMIOINFO;
 
-    _MMCKINFO_struct* = RECORD [ALIGN1]
+    _MMCKINFO_struct* = RECORD [noalign]
       ckid* : FOURCC;
       cksize* : DWORD;
       fccType* : FOURCC;
@@ -16610,7 +16612,7 @@ TYPE
 
     YIELDPROC* = PROCEDURE (mciId : MCIDEVICEID; dwYieldData : DWORD) : UINT;
 
-    tagMCI_GENERIC_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_GENERIC_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD
     END;
 
@@ -16620,7 +16622,7 @@ TYPE
 
     LPMCI_GENERIC_PARMS* = PMCI_GENERIC_PARMS;
 
-    tagMCI_OPEN_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_OPEN_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       wDeviceID* : MCIDEVICEID;
       lpstrDeviceType* : LPCSTR;
@@ -16634,7 +16636,7 @@ TYPE
 
     LPMCI_OPEN_PARMSA* = PMCI_OPEN_PARMSA;
 
-    tagMCI_OPEN_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_OPEN_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       wDeviceID* : MCIDEVICEID;
       lpstrDeviceType* : LPCWSTR;
@@ -16654,7 +16656,7 @@ TYPE
 
     LPMCI_OPEN_PARMS* = LPMCI_OPEN_PARMSA;
 
-    tagMCI_PLAY_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_PLAY_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwFrom* : DWORD;
       dwTo* : DWORD
@@ -16666,7 +16668,7 @@ TYPE
 
     LPMCI_PLAY_PARMS* = PMCI_PLAY_PARMS;
 
-    tagMCI_SEEK_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_SEEK_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwTo* : DWORD
     END;
@@ -16677,7 +16679,7 @@ TYPE
 
     LPMCI_SEEK_PARMS* = PMCI_SEEK_PARMS;
 
-    tagMCI_STATUS_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_STATUS_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwReturn* : DWORD;
       dwItem* : DWORD;
@@ -16690,7 +16692,7 @@ TYPE
 
     LPMCI_STATUS_PARMS* = PMCI_STATUS_PARMS;
 
-    tagMCI_INFO_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_INFO_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpstrReturn* : LPSTR;
       dwRetSize* : DWORD
@@ -16700,7 +16702,7 @@ TYPE
 
     LPMCI_INFO_PARMSA* = POINTER TO tagMCI_INFO_PARMSA_struct;
 
-    tagMCI_INFO_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_INFO_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpstrReturn* : LPWSTR;
       dwRetSize* : DWORD
@@ -16714,7 +16716,7 @@ TYPE
 
     LPMCI_INFO_PARMS* = LPMCI_INFO_PARMSA;
 
-    tagMCI_GETDEVCAPS_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_GETDEVCAPS_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwReturn* : DWORD;
       dwItem* : DWORD
@@ -16726,7 +16728,7 @@ TYPE
 
     LPMCI_GETDEVCAPS_PARMS* = PMCI_GETDEVCAPS_PARMS;
 
-    tagMCI_SYSINFO_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_SYSINFO_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpstrReturn* : LPSTR;
       dwRetSize* : DWORD;
@@ -16740,7 +16742,7 @@ TYPE
 
     LPMCI_SYSINFO_PARMSA* = PMCI_SYSINFO_PARMSA;
 
-    tagMCI_SYSINFO_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_SYSINFO_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpstrReturn* : LPWSTR;
       dwRetSize* : DWORD;
@@ -16760,7 +16762,7 @@ TYPE
 
     LPMCI_SYSINFO_PARMS* = LPMCI_SYSINFO_PARMSA;
 
-    tagMCI_SET_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_SET_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwTimeFormat* : DWORD;
       dwAudio* : DWORD
@@ -16772,7 +16774,7 @@ TYPE
 
     LPMCI_SET_PARMS* = PMCI_SET_PARMS;
 
-    tagMCI_BREAK_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_BREAK_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       nVirtKey* : LONGINT;
       hwndBreak* : HWND
@@ -16784,7 +16786,7 @@ TYPE
 
     LPMCI_BREAK_PARMS* = PMCI_BREAK_PARMS;
 
-    tagMCI_SAVE_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_SAVE_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpfilename* : LPCSTR
     END;
@@ -16795,7 +16797,7 @@ TYPE
 
     LPMCI_SAVE_PARMSA* = PMCI_SAVE_PARMSA;
 
-    tagMCI_SAVE_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_SAVE_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpfilename* : LPCWSTR
     END;
@@ -16812,7 +16814,7 @@ TYPE
 
     LPMCI_SAVE_PARMS* = LPMCI_SAVE_PARMSA;
 
-    tagMCI_LOAD_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_LOAD_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpfilename* : LPCSTR
     END;
@@ -16823,7 +16825,7 @@ TYPE
 
     LPMCI_LOAD_PARMSA* = PMCI_LOAD_PARMSA;
 
-    tagMCI_LOAD_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_LOAD_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpfilename* : LPCWSTR
     END;
@@ -16840,7 +16842,7 @@ TYPE
 
     LPMCI_LOAD_PARMS* = LPMCI_LOAD_PARMSA;
 
-    tagMCI_RECORD_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_RECORD_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwFrom* : DWORD;
       dwTo* : DWORD
@@ -16850,7 +16852,7 @@ TYPE
 
     LPMCI_RECORD_PARMS* = POINTER TO tagMCI_RECORD_PARMS_struct;
 
-    tagMCI_VD_PLAY_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_VD_PLAY_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwFrom* : DWORD;
       dwTo* : DWORD;
@@ -16863,7 +16865,7 @@ TYPE
 
     LPMCI_VD_PLAY_PARMS* = PMCI_VD_PLAY_PARMS;
 
-    tagMCI_VD_STEP_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_VD_STEP_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwFrames* : DWORD
     END;
@@ -16874,7 +16876,7 @@ TYPE
 
     LPMCI_VD_STEP_PARMS* = PMCI_VD_STEP_PARMS;
 
-    tagMCI_VD_ESCAPE_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_VD_ESCAPE_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpstrCommand* : LPCSTR
     END;
@@ -16885,7 +16887,7 @@ TYPE
 
     LPMCI_VD_ESCAPE_PARMSA* = PMCI_VD_ESCAPE_PARMSA;
 
-    tagMCI_VD_ESCAPE_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_VD_ESCAPE_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpstrCommand* : LPCWSTR
     END;
@@ -16902,7 +16904,7 @@ TYPE
 
     LPMCI_VD_ESCAPE_PARMS* = LPMCI_VD_ESCAPE_PARMSA;
 
-    tagMCI_WAVE_OPEN_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_WAVE_OPEN_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       wDeviceID* : MCIDEVICEID;
       lpstrDeviceType* : LPCSTR;
@@ -16917,7 +16919,7 @@ TYPE
 
     LPMCI_WAVE_OPEN_PARMSA* = PMCI_WAVE_OPEN_PARMSA;
 
-    tagMCI_WAVE_OPEN_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_WAVE_OPEN_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       wDeviceID* : MCIDEVICEID;
       lpstrDeviceType* : LPCWSTR;
@@ -16938,7 +16940,7 @@ TYPE
 
     LPMCI_WAVE_OPEN_PARMS* = LPMCI_WAVE_OPEN_PARMSA;
 
-    tagMCI_WAVE_DELETE_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_WAVE_DELETE_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwFrom* : DWORD;
       dwTo* : DWORD
@@ -16950,7 +16952,7 @@ TYPE
 
     LPMCI_WAVE_DELETE_PARMS* = PMCI_WAVE_DELETE_PARMS;
 
-    tagMCI_WAVE_SET_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_WAVE_SET_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwTimeFormat* : DWORD;
       dwAudio* : DWORD;
@@ -16974,7 +16976,7 @@ TYPE
 
     LPMCI_WAVE_SET_PARMS* = PMCI_WAVE_SET_PARMS;
 
-    tagMCI_SEQ_SET_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_SEQ_SET_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwTimeFormat* : DWORD;
       dwAudio* : DWORD;
@@ -16991,7 +16993,7 @@ TYPE
 
     LPMCI_SEQ_SET_PARMS* = PMCI_SEQ_SET_PARMS;
 
-    tagMCI_ANIM_OPEN_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_ANIM_OPEN_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       wDeviceID* : MCIDEVICEID;
       lpstrDeviceType* : LPCSTR;
@@ -17007,7 +17009,7 @@ TYPE
 
     LPMCI_ANIM_OPEN_PARMSA* = PMCI_ANIM_OPEN_PARMSA;
 
-    tagMCI_ANIM_OPEN_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_ANIM_OPEN_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       wDeviceID* : MCIDEVICEID;
       lpstrDeviceType* : LPCWSTR;
@@ -17029,7 +17031,7 @@ TYPE
 
     LPMCI_ANIM_OPEN_PARMS* = LPMCI_ANIM_OPEN_PARMSA;
 
-    tagMCI_ANIM_PLAY_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_ANIM_PLAY_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwFrom* : DWORD;
       dwTo* : DWORD;
@@ -17042,7 +17044,7 @@ TYPE
 
     LPMCI_ANIM_PLAY_PARMS* = PMCI_ANIM_PLAY_PARMS;
 
-    tagMCI_ANIM_STEP_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_ANIM_STEP_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       dwFrames* : DWORD
     END;
@@ -17053,7 +17055,7 @@ TYPE
 
     LPMCI_ANIM_STEP_PARMS* = PMCI_ANIM_STEP_PARMS;
 
-    tagMCI_ANIM_WINDOW_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_ANIM_WINDOW_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       hWnd* : HWND;
       nCmdShow* : UINT;
@@ -17066,7 +17068,7 @@ TYPE
 
     LPMCI_ANIM_WINDOW_PARMSA* = PMCI_ANIM_WINDOW_PARMSA;
 
-    tagMCI_ANIM_WINDOW_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_ANIM_WINDOW_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       hWnd* : HWND;
       nCmdShow* : UINT;
@@ -17085,7 +17087,7 @@ TYPE
 
     LPMCI_ANIM_WINDOW_PARMS* = LPMCI_ANIM_WINDOW_PARMSA;
 
-    tagMCI_ANIM_RECT_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_ANIM_RECT_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       rc* : RECT
     END;
@@ -17096,7 +17098,7 @@ TYPE
 
     LPMCI_ANIM_RECT_PARMS* = PMCI_ANIM_RECT_PARMS;
 
-    tagMCI_ANIM_UPDATE_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_ANIM_UPDATE_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       rc* : RECT;
       hDC* : HDC
@@ -17108,7 +17110,7 @@ TYPE
 
     LPMCI_ANIM_UPDATE_PARMS* = PMCI_ANIM_UPDATE_PARMS;
 
-    tagMCI_OVLY_OPEN_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_OVLY_OPEN_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       wDeviceID* : MCIDEVICEID;
       lpstrDeviceType* : LPCSTR;
@@ -17124,7 +17126,7 @@ TYPE
 
     LPMCI_OVLY_OPEN_PARMSA* = PMCI_OVLY_OPEN_PARMSA;
 
-    tagMCI_OVLY_OPEN_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_OVLY_OPEN_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       wDeviceID* : MCIDEVICEID;
       lpstrDeviceType* : LPCWSTR;
@@ -17146,7 +17148,7 @@ TYPE
 
     LPMCI_OVLY_OPEN_PARMS* = LPMCI_OVLY_OPEN_PARMSA;
 
-    tagMCI_OVLY_WINDOW_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_OVLY_WINDOW_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       hWnd* : HWND;
       nCmdShow* : UINT;
@@ -17159,7 +17161,7 @@ TYPE
 
     LPMCI_OVLY_WINDOW_PARMSA* = PMCI_OVLY_WINDOW_PARMSA;
 
-    tagMCI_OVLY_WINDOW_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_OVLY_WINDOW_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       hWnd* : HWND;
       nCmdShow* : UINT;
@@ -17178,7 +17180,7 @@ TYPE
 
     LPMCI_OVLY_WINDOW_PARMS* = LPMCI_OVLY_WINDOW_PARMSA;
 
-    tagMCI_OVLY_RECT_PARMS_struct* = RECORD [ALIGN1]
+    tagMCI_OVLY_RECT_PARMS_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       rc* : RECT
     END;
@@ -17189,7 +17191,7 @@ TYPE
 
     LPMCI_OVLY_RECT_PARMS* = PMCI_OVLY_RECT_PARMS;
 
-    tagMCI_OVLY_SAVE_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_OVLY_SAVE_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpfilename* : LPCSTR;
       rc* : RECT
@@ -17201,7 +17203,7 @@ TYPE
 
     LPMCI_OVLY_SAVE_PARMSA* = PMCI_OVLY_SAVE_PARMSA;
 
-    tagMCI_OVLY_SAVE_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_OVLY_SAVE_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpfilename* : LPCWSTR;
       rc* : RECT
@@ -17219,7 +17221,7 @@ TYPE
 
     LPMCI_OVLY_SAVE_PARMS* = LPMCI_OVLY_SAVE_PARMSA;
 
-    tagMCI_OVLY_LOAD_PARMSA_struct* = RECORD [ALIGN1]
+    tagMCI_OVLY_LOAD_PARMSA_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpfilename* : LPCSTR;
       rc* : RECT
@@ -17231,7 +17233,7 @@ TYPE
 
     LPMCI_OVLY_LOAD_PARMSA* = PMCI_OVLY_LOAD_PARMSA;
 
-    tagMCI_OVLY_LOAD_PARMSW_struct* = RECORD [ALIGN1]
+    tagMCI_OVLY_LOAD_PARMSW_struct* = RECORD [noalign]
       dwCallback* : DWORD;
       lpfilename* : LPCWSTR;
       rc* : RECT
