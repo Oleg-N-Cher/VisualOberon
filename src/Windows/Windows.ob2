@@ -8134,7 +8134,7 @@ TYPE
 
     LPDWORD* = PDWORD;
 
-    LPVOID* = LONGINT (* void pointer *);
+    LPVOID* = SYSTEM.ADRINT (* void pointer *);
 
     LPCVOID* = LPVOID;
 

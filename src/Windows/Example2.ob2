@@ -23,11 +23,6 @@ VAR
   message : ARRAY 256 OF CHAR;		(* text to be displayed in window *)
   messageLen : INTEGER;			(* length of displayed text *)
 
-  PROCEDURE TOLONG(i : HUGEINT) : LONGINT;
-  BEGIN
-    RETURN SHORT(i);
-  END TOLONG;
-
 (*
 ** MessageHandler - handle events in our window
 ** MessageHandler is called by Windows and must be declared "Pascal" so that
@@ -78,8 +73,8 @@ VAR
   class : W.WNDCLASS;
   res : W.BOOL;
 BEGIN
-  class.hCursor := W.LoadCursorA(0, S.VAL(W.LPCSTR, TOLONG(W.IDC_ARROW)));
-  class.hIcon := W.LoadIconA(instance, S.VAL(W.LPCSTR, TOLONG(iconId)));
+  class.hCursor := W.LoadCursorA(0, S.VAL(W.LPCSTR, W.IDC_ARROW));
+  class.hIcon := W.LoadIconA(instance, S.VAL(W.LPCSTR, iconId));
   class.lpszMenuName := NIL;
   class.lpszClassName := className;
   class.hbrBackground := W.GetStockObject(W.WHITE_BRUSH);
@@ -91,8 +86,8 @@ BEGIN
   res := W.RegisterClassA(class);
   window := W.CreateWindowExA(0, className, title,
     W.WS_OVERLAPPEDWINDOW,
-    TOLONG(W.CW_USEDEFAULT), TOLONG(W.CW_USEDEFAULT),
-    TOLONG(W.CW_USEDEFAULT), TOLONG(W.CW_USEDEFAULT),
+    W.CW_USEDEFAULT, W.CW_USEDEFAULT,
+    W.CW_USEDEFAULT, W.CW_USEDEFAULT,
     0, 0, instance, 0);
   res := W.ShowWindow(window, W.SW_SHOWDEFAULT);
   res := W.UpdateWindow(window);

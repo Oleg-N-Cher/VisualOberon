@@ -1,3 +1,4 @@
 /target/win32/*.a
+/target/win32/*.exe
 /target/win64/*.a
-
+/target/win64/*.exe
