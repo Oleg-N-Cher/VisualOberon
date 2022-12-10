@@ -1,0 +1,3 @@
+* LongStrings.Capitalize cannot be implemented using the internal CAP function
+  - it does not work for Unicode strings. We need to provide
+  an OS system function call for this task.

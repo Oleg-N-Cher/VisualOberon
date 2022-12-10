@@ -1,6 +1,6 @@
-(* 	$Id: Strings.Mod,v 1.2 2002/03/11 21:33:22 mva Exp $	 *)
-MODULE Strings;
-(*  Facilities for manipulating strings in character arrays.
+(* 	$Id: LongStrings.cp,v 1.1 2022/12/11 1:11:02 mva Exp $	 *)
+MODULE LongStrings;
+(*  Facilities for manipulating strings in LONGCHAR arrays.
     Copyright (C) 1996, 1997  Michael van Acken
 
     This module is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ default it is installed @emph{without} index checks.
 
 
 TYPE
-  CompareResults* = SHORTINT;
+  CompareResults* = BYTE;
   (**Result type of @oproc{Compare}.  *)
   
 CONST
@@ -52,22 +52,16 @@ CONST
      than the second one.  *)
  
 
-PROCEDURE Length* (stringVal: ARRAY OF CHAR): INTEGER;
+PROCEDURE Length* (IN stringVal: ARRAY OF CHAR): INTEGER;
 (**Returns the length of @oparam{stringVal}.  This is equal to the number of 
    characters in @oparam{stringVal} up to and excluding the first @code{0X}. *)
-  VAR
-    i: INTEGER;
   BEGIN
-    i := 0;
-    WHILE (stringVal[i] # 0X) DO
-      INC (i)
-    END;
-    RETURN i
+    RETURN LEN(stringVal$)
   END Length;
 
  
  
-PROCEDURE Assign* (source: ARRAY OF CHAR; VAR destination: ARRAY OF CHAR);
+PROCEDURE Assign* (IN source: ARRAY OF CHAR; OUT destination: ARRAY OF CHAR);
 (**Copies @oparam{source} to @oparam{destination}.  Equivalent to the
    predefined procedure @code{COPY}.  Unlike @code{COPY}, this procedure can be
    assigned to a procedure variable.  *)
@@ -81,9 +75,9 @@ PROCEDURE Assign* (source: ARRAY OF CHAR; VAR destination: ARRAY OF CHAR);
     UNTIL (destination[i] = 0X) OR (i = LEN (destination)-1);
     destination[i] := 0X
   END Assign;
-  
-PROCEDURE Extract* (source: ARRAY OF CHAR; startPos, numberToExtract: INTEGER;
-                    VAR destination: ARRAY OF CHAR);
+
+PROCEDURE Extract* (IN source: ARRAY OF CHAR; startPos, numberToExtract: INTEGER;
+                    OUT destination: ARRAY OF CHAR);
 (**Copies at most @oparam{numberToExtract} characters from @oparam{source} to
    @oparam{destination}, starting at position @oparam{startPos} in
    @oparam{source}.  An empty string value will be extracted if
@@ -97,7 +91,7 @@ PROCEDURE Extract* (source: ARRAY OF CHAR; startPos, numberToExtract: INTEGER;
   BEGIN
     (* make sure that we get an empty string if `startPos' refers to an array
        index beyond `Length (source)'  *)
-    sourceLength := Length (source);
+    sourceLength := LEN (source$);
     IF (startPos > sourceLength) THEN
       startPos := sourceLength
     END;
@@ -105,7 +99,7 @@ PROCEDURE Extract* (source: ARRAY OF CHAR; startPos, numberToExtract: INTEGER;
     (* make sure that `numberToExtract' doesn't exceed the capacity 
        of `destination' *)
     IF (numberToExtract >= LEN (destination)) THEN
-      numberToExtract := SHORT (LEN (destination))-1
+      numberToExtract := LEN (destination)-1
     END;
     
     (* copy up to `numberToExtract' characters to `destination' *)
@@ -130,7 +124,7 @@ PROCEDURE Delete* (VAR stringVar: ARRAY OF CHAR;
   VAR
     stringLength, i: INTEGER;
   BEGIN
-    stringLength := Length (stringVar);
+    stringLength := LEN (stringVar$);
     IF (startPos+numberToDelete < stringLength) THEN
       (* `stringVar' has remaining characters beyond the deleted section;
          these have to be moved forward by `numberToDelete' characters *)
@@ -142,7 +136,7 @@ PROCEDURE Delete* (VAR stringVar: ARRAY OF CHAR;
     END
   END Delete;
  
-PROCEDURE Insert* (source: ARRAY OF CHAR; startPos: INTEGER;
+PROCEDURE Insert* (IN source: ARRAY OF CHAR; startPos: INTEGER;
                    VAR destination: ARRAY OF CHAR);
 (**Inserts @oparam{source} into @oparam{destination} at position
    @oparam{startPos}.  After the call @oparam{destination} contains the string
@@ -159,9 +153,9 @@ PROCEDURE Insert* (source: ARRAY OF CHAR; startPos: INTEGER;
   VAR
     sourceLength, destLength, destMax, i: INTEGER;
   BEGIN
-    destLength := Length (destination);
-    sourceLength := Length (source);
-    destMax := SHORT (LEN (destination))-1;
+    destLength := LEN (destination$);
+    sourceLength := LEN (source$);
+    destMax := LEN (destination)-1;
     IF (startPos+sourceLength < destMax) THEN
       (* `source' is inserted inside of `destination' *)
       IF (destLength+sourceLength > destMax) THEN
@@ -187,7 +181,7 @@ PROCEDURE Insert* (source: ARRAY OF CHAR; startPos: INTEGER;
     END
   END Insert;
   
-PROCEDURE Replace* (source: ARRAY OF CHAR; startPos: INTEGER;
+PROCEDURE Replace* (IN source: ARRAY OF CHAR; startPos: INTEGER;
                     VAR destination: ARRAY OF CHAR);
 (**Copies @oparam{source} into @oparam{destination}, starting at position
    @oparam{startPos}. Copying stops when all of @oparam{source} has been
@@ -202,7 +196,7 @@ PROCEDURE Replace* (source: ARRAY OF CHAR; startPos: INTEGER;
   VAR
     destLength, i: INTEGER;
   BEGIN
-    destLength := Length (destination);
+    destLength := LEN (destination$);
     IF (startPos < destLength) THEN
       (* if `startPos' is inside `destination', then replace characters until
          the end of `source' or `destination' is reached *)
@@ -215,12 +209,12 @@ PROCEDURE Replace* (source: ARRAY OF CHAR; startPos: INTEGER;
     END
   END Replace;
  
-PROCEDURE Append* (source: ARRAY OF CHAR; VAR destination: ARRAY OF CHAR);
+PROCEDURE Append* (IN source: ARRAY OF CHAR; VAR destination: ARRAY OF CHAR);
 (**Appends @oparam{source} to @oparam{destination}. *)
   VAR
     destLength, i: INTEGER;
   BEGIN
-    destLength := Length (destination);
+    destLength := LEN (destination$);
     i := 0;
     WHILE (destLength < LEN (destination)-1) & (source[i] # 0X) DO
       destination[destLength] := source[i];
@@ -230,8 +224,8 @@ PROCEDURE Append* (source: ARRAY OF CHAR; VAR destination: ARRAY OF CHAR);
     destination[destLength] := 0X
   END Append;
   
-PROCEDURE Concat* (source1, source2: ARRAY OF CHAR; 
-                   VAR destination: ARRAY OF CHAR);
+PROCEDURE Concat* (IN source1, source2: ARRAY OF CHAR;
+                   OUT destination: ARRAY OF CHAR);
 (**Concatenates @oparam{source2} onto @oparam{source1} and copies the result
    into @oparam{destination}.  *)
   VAR
@@ -255,7 +249,7 @@ PROCEDURE Concat* (source1, source2: ARRAY OF CHAR;
 
 
 
-PROCEDURE CanAssignAll* (sourceLength: INTEGER; VAR destination: ARRAY OF CHAR): BOOLEAN;
+PROCEDURE CanAssignAll* (sourceLength: INTEGER; IN destination: ARRAY OF CHAR): BOOLEAN;
 (**Returns @code{TRUE} if a number of characters, indicated by
    @oparam{sourceLength}, will fit into @oparam{destination}; otherwise returns
    @code{FALSE}.
@@ -268,7 +262,7 @@ PROCEDURE CanAssignAll* (sourceLength: INTEGER; VAR destination: ARRAY OF CHAR):
   END CanAssignAll;
  
 PROCEDURE CanExtractAll* (sourceLength, startPos, numberToExtract: INTEGER;
-                          VAR destination: ARRAY OF CHAR): BOOLEAN;
+                          IN destination: ARRAY OF CHAR): BOOLEAN;
 (**Returns @code{TRUE} if there are @oparam{numberToExtract} characters
    starting at @oparam{startPos} and within the @oparam{sourceLength} of some
    string, and if the capacity of @oparam{destination} is sufficient to hold
@@ -298,7 +292,7 @@ PROCEDURE CanDeleteAll* (stringLength, startPos,
   END CanDeleteAll;
   
 PROCEDURE CanInsertAll* (sourceLength, startPos: INTEGER;
-                         VAR destination: ARRAY OF CHAR): BOOLEAN;
+                         IN destination: ARRAY OF CHAR): BOOLEAN;
 (**Returns @code{TRUE} if there is room for the insertion of
    @oparam{sourceLength} characters from some string into @oparam{destination}
    starting at @oparam{startPos}; otherwise returns @code{FALSE}.
@@ -309,13 +303,13 @@ PROCEDURE CanInsertAll* (sourceLength, startPos: INTEGER;
   VAR
     lenDestination: INTEGER;
   BEGIN
-    lenDestination := Length (destination);
+    lenDestination := LEN (destination$);
     RETURN (startPos <= lenDestination) &
            (sourceLength+lenDestination < LEN (destination))
   END CanInsertAll;
  
 PROCEDURE CanReplaceAll* (sourceLength, startPos: INTEGER;
-                          VAR destination: ARRAY OF CHAR): BOOLEAN;
+                          IN destination: ARRAY OF CHAR): BOOLEAN;
 (**Returns @code{TRUE} if there is room for the replacement of
    @oparam{sourceLength} characters in @oparam{destination} starting at
    @oparam{startPos}; otherwise returns @code{FALSE}.
@@ -324,11 +318,11 @@ PROCEDURE CanReplaceAll* (sourceLength, startPos: INTEGER;
    @oparam{sourceLength} and @oparam{startPos} are not negative.
    @end precond  *)
   BEGIN
-    RETURN (sourceLength+startPos <= Length(destination))
+    RETURN (sourceLength+startPos <= LEN(destination$))
   END CanReplaceAll;
  
 PROCEDURE CanAppendAll* (sourceLength: INTEGER; 
-                         VAR destination: ARRAY OF CHAR): BOOLEAN;
+                         IN destination: ARRAY OF CHAR): BOOLEAN;
 (**Returns @code{TRUE} if there is sufficient room in @oparam{destination} to
    append a string of length @oparam{sourceLength} to the string in
    @oparam{destination}; otherwise returns @code{FALSE}.
@@ -337,11 +331,11 @@ PROCEDURE CanAppendAll* (sourceLength: INTEGER;
    @oparam{sourceLength} is not negative.
    @end precond  *)
   BEGIN
-    RETURN (Length (destination)+sourceLength < LEN (destination))
+    RETURN (LEN (destination$)+sourceLength < LEN (destination))
   END CanAppendAll;
  
 PROCEDURE CanConcatAll* (source1Length, source2Length: INTEGER;
-                         VAR destination: ARRAY OF CHAR): BOOLEAN;
+                         IN destination: ARRAY OF CHAR): BOOLEAN;
 (**Returns @code{TRUE} if there is sufficient room in @oparam{destination} for
    a two strings of lengths @oparam{source1Length} and @oparam{source2Length};
    otherwise returns @code{FALSE}.
@@ -355,7 +349,7 @@ PROCEDURE CanConcatAll* (source1Length, source2Length: INTEGER;
   
 
 
-PROCEDURE Compare* (stringVal1, stringVal2: ARRAY OF CHAR): CompareResults;
+PROCEDURE Compare* (IN stringVal1, stringVal2: ARRAY OF CHAR): CompareResults;
 (**Returns @oconst{less}, @oconst{equal}, or @oconst{greater}, according as
    @oparam{stringVal1} is lexically less than, equal to, or greater than
    @oparam{stringVal2}.  Note that Oberon-2 already contains predefined
@@ -376,7 +370,7 @@ PROCEDURE Compare* (stringVal1, stringVal2: ARRAY OF CHAR): CompareResults;
     END
   END Compare;
  
-PROCEDURE Equal* (stringVal1, stringVal2: ARRAY OF CHAR): BOOLEAN;
+PROCEDURE Equal* (IN stringVal1, stringVal2: ARRAY OF CHAR): BOOLEAN;
 (**Returns @samp{stringVal1 = stringVal2}.  Unlike the predefined operator
    @samp{=}, this procedure can be assigned to a procedure variable.  *)
   VAR
@@ -389,8 +383,8 @@ PROCEDURE Equal* (stringVal1, stringVal2: ARRAY OF CHAR): BOOLEAN;
     RETURN (stringVal1[i] = 0X) & (stringVal2[i] = 0X)
   END Equal;
  
-PROCEDURE FindNext* (pattern, stringToSearch: ARRAY OF CHAR; startPos: INTEGER;
-                     VAR patternFound: BOOLEAN; VAR posOfPattern: INTEGER);
+PROCEDURE FindNext* (IN pattern, stringToSearch: ARRAY OF CHAR; startPos: INTEGER;
+                     OUT patternFound: BOOLEAN; OUT posOfPattern: INTEGER);
 (**Looks forward for next occurrence of @oparam{pattern} in
    @oparam{stringToSearch}, starting the search at position @oparam{startPos}.
    If @samp{startPos < Length(stringToSearch)} and @oparam{pattern} is found,
@@ -408,7 +402,7 @@ PROCEDURE FindNext* (pattern, stringToSearch: ARRAY OF CHAR; startPos: INTEGER;
   VAR
     patternPos: INTEGER;
   BEGIN
-    IF (startPos < Length (stringToSearch)) THEN
+    IF (startPos < LEN (stringToSearch$)) THEN
       patternPos := 0;
       LOOP
         IF (pattern[patternPos] = 0X) THEN     
@@ -435,8 +429,8 @@ PROCEDURE FindNext* (pattern, stringToSearch: ARRAY OF CHAR; startPos: INTEGER;
     END
   END FindNext;
   
-PROCEDURE FindPrev* (pattern, stringToSearch: ARRAY OF CHAR; startPos: INTEGER;
-                     VAR patternFound: BOOLEAN; VAR posOfPattern: INTEGER);
+PROCEDURE FindPrev* (IN pattern, stringToSearch: ARRAY OF CHAR; startPos: INTEGER;
+                     OUT patternFound: BOOLEAN; OUT posOfPattern: INTEGER);
 (**Looks backward for the previous occurrence of @oparam{pattern} in
    @oparam{stringToSearch} and returns the position of the first character of
    the @oparam{pattern} if found.  The search for the pattern begins at
@@ -452,8 +446,8 @@ PROCEDURE FindPrev* (pattern, stringToSearch: ARRAY OF CHAR; startPos: INTEGER;
     patternPos, stringLength, patternLength: INTEGER;
   BEGIN
     (* correct `startPos' if it is larger than the possible searching range *)
-    stringLength := Length (stringToSearch);
-    patternLength := Length (pattern);
+    stringLength := LEN (stringToSearch$);
+    patternLength := LEN (pattern$);
     IF (startPos > stringLength-patternLength) THEN
       startPos := stringLength-patternLength
     END;
@@ -486,9 +480,9 @@ PROCEDURE FindPrev* (pattern, stringToSearch: ARRAY OF CHAR; startPos: INTEGER;
     END
   END FindPrev;
  
-PROCEDURE FindDiff* (stringVal1, stringVal2: ARRAY OF CHAR;
-                     VAR differenceFound: BOOLEAN; 
-                     VAR posOfDifference: INTEGER);
+PROCEDURE FindDiff* (IN stringVal1, stringVal2: ARRAY OF CHAR;
+                     OUT differenceFound: BOOLEAN; 
+                     OUT posOfDifference: INTEGER);
 (**Compares the string values in @oparam{stringVal1} and @oparam{stringVal2}
    for differences.  If they are equal, @oparam{differenceFound} is returned as
    @code{FALSE}, and @code{TRUE} otherwise.  If @oparam{differenceFound} is
@@ -521,4 +515,33 @@ PROCEDURE Capitalize* (VAR stringVar: ARRAY OF CHAR);
     END
   END Capitalize;
  
-END Strings.
+
+PROCEDURE Long* (IN source: ARRAY OF SHORTCHAR; OUT destination: ARRAY OF CHAR);
+(**Copies @oparam{source} to @oparam{destination}, extending CHAR values to
+   LONGCHAR on the way.  Equivalent to the predefined procedure @samp{COPY}.
+   Unlike @samp{COPY}, this procedure can be assigned to a procedure variable.  *)
+  BEGIN
+    destination := source$
+  END Long;
+
+PROCEDURE Short* (IN source: ARRAY OF CHAR; repl: SHORTCHAR; OUT destination: ARRAY OF SHORTCHAR);
+(**Copies @oparam{source} to @oparam{destination}, converting @samp{LONGCHAR}
+   values to CHAR on the way.  @samp{LONGCHAR} characters outside the range
+   @samp{[MIN(CHAR)..MAX(CHAR)]} are replaced by the character @oparam{repl}.  *)
+  VAR
+    i, len: INTEGER;
+  BEGIN
+    len := LEN (destination)-1;
+    i := 0;
+    WHILE (source[i] # 0X) & (i # len) DO
+      IF (source[i] <= MAX (CHAR)) THEN
+        destination[i] := SHORT (source[i])
+      ELSE
+        destination[i] := repl
+      END;
+      INC (i)
+    END;
+    destination[i] := 0X
+  END Short;
+
+END LongStrings.
