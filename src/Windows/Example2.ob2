@@ -21,7 +21,7 @@ VAR
   window : W.HWND;			(* handle for main window *)
 
   message : ARRAY 256 OF CHAR;		(* text to be displayed in window *)
-  messageLen : INTEGER;			(* length of displayed text *)
+  messageLen : LONGINT;			(* length of displayed text *)
 
 (*
 ** MessageHandler - handle events in our window

@@ -3,7 +3,7 @@ CD ..\obj
 SET PATH=..\..\win32\bin;%PATH%
 SET OBERON=.;..\sym;..\..\..\src\Windows
 
-ofront+ -s -88 Windows.ob2 Example1.ob2 -m Example2.ob2 -m Example3.ob2 -m Example4.ob2 -m
+ofront+ -s88 Windows.ob2 Example1.ob2 -m Example2.ob2 -m Example3.ob2 -m Example4.ob2 -m
 IF errorlevel 1 PAUSE
 
 FOR %%i IN (*.sym) DO MOVE /Y %%i ..\sym >NUL
@@ -18,5 +18,5 @@ IF errorlevel 1 PAUSE
 IF errorlevel 1 PAUSE
 %CC% Example3.c %Lib% -o..\Example3.exe
 IF errorlevel 1 PAUSE
-%CC% Example4.c %Lib% -o..\Example4.exe
+%CC% Example4.c %Lib% -o..\Example4.exe -mwindows
 IF errorlevel 1 PAUSE
