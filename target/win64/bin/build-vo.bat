@@ -1,1 +1,1 @@
-@CALL ..\Bin\o2c.bat && ..\Bin\cc.bat
+@CALL ..\Bin\o2c-vo.bat && ..\Bin\cc-vo.bat
