@@ -6,8 +6,8 @@ SET CC=gcc.exe -m64 -fPIC -Os -g0 -I..\..\..\src\Ofront -I..\..\..\src\OO2C -I. 
 SET AR=ar.exe -rc ..\OO2C.a
 IF EXIST ..\OO2C.a DEL ..\OO2C.a
 
-%CC% LongStrings.c Strings.c ..\..\..\src\OO2C\SysClock.c
+%CC% LongStrings.c Strings.c ..\..\..\src\OO2C\SysClock.c Time.c
 IF errorlevel 1 PAUSE
-%AR% LongStrings.o Strings.o SysClock.o
+%AR% LongStrings.o Strings.o SysClock.o Time.o
 
 DEL /Q *.o
