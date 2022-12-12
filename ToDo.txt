@@ -1,3 +1,7 @@
-* LongStrings.Capitalize cannot be implemented using the internal CAP function
-  - it does not work for Unicode strings. We need to provide
+* LongStrings.Capitalize cannot be implemented using the internal
+  CAP function - it does not work for Unicode strings. We need to provide
   an OS system function call for this task.
+
+* SysClock.c uses the function geteuid() to know can we set clock.
+  Under Windows there is no implementation of this function, so we have
+  to find out if we have the admin privileges in other way.
