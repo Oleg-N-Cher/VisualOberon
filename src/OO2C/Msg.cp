@@ -1,5 +1,5 @@
-(*      $Id: Msg.Mod,v 1.1 2002/05/31 19:05:17 mva Exp $   *)
-MODULE Msg [OOC_EXTENSIONS];
+(*      $Id: Msg.cp,v 1.1 2022/12/13 3:11:27 mva Exp $   *)
+MODULE Msg (*OOC_EXTENSIONS*);
 (*  Framework for messages (creation, expansion, conversion to text).
     Copyright (C) 1999, 2000, 2002  Michael van Acken
 
@@ -42,7 +42,7 @@ problems and possibly emitting more error messages.
 *)
 
 IMPORT
-  CharClass, Strings, LongStrings, IntStr;
+  CharClass, LongStrings, IntStr;
 
 CONST
   sizeAttrName* = 128-1;
@@ -53,21 +53,21 @@ CONST
   (**Maximum length of an attribute's replacement text.  *)
   
 TYPE  (* the basic string and character types used by this module: *)
-  Char* = CHAR;
+  Char* = SHORTCHAR;
   String* = ARRAY OF Char;
   StringPtr* = POINTER TO String;
   
-  LChar* = LONGCHAR;
+  LChar* = CHAR;
   LString* = ARRAY OF LChar;
   LStringPtr* = POINTER TO LString;
   
-  Code* = LONGINT;
+  Code* = INTEGER;
   (**Identifier for a message's content.  Together with the message context,
      this value uniquely identifies the type of the message.  *)
 
 TYPE
   Attribute* = POINTER TO AttributeDesc;
-  AttributeDesc* = RECORD [ABSTRACT]
+  AttributeDesc* = ABSTRACT RECORD
     (**An attribute is a @samp{(name, value)} tuple, which can be associated
        with a message.  When a message is tranlated into its readable version
        through the @oproc{Msg.GetText} function, the value part is first
@@ -125,7 +125,7 @@ TYPE
      that all refer to the same resource.  For example within a parser,
      multiple messages are collected before aborting processing and presenting
      all messages to the user.  *)
-    msgCount-: LONGINT;
+    msgCount-: INTEGER;
     (**The number of messages in the list.  An empty list has a
        @ofield{msgCount} of zero.  *)
     msgList-, lastMsg: Msg;
@@ -137,7 +137,7 @@ TYPE (* default implementations for some commonly used message attributes: *)
   IntAttribute* = POINTER TO IntAttributeDesc;
   IntAttributeDesc = RECORD
     (AttributeDesc)
-    int-: LONGINT;
+    int-: INTEGER;
   END;
   StringAttribute* = POINTER TO StringAttributeDesc;
   StringAttributeDesc = RECORD
@@ -159,7 +159,7 @@ TYPE (* default implementations for some commonly used message attributes: *)
 (* Context
    ------------------------------------------------------------------------ *)
 
-PROCEDURE InitContext* (context: Context; id: String);
+PROCEDURE InitContext* (context: Context; IN id: String);
 (**The string argument @oparam{id} should describe the message context to the
    programmer.  It should not appear in output generated for a program's user,
    or at least it should not be necessary for a user to interpret ths string to
@@ -167,11 +167,11 @@ PROCEDURE InitContext* (context: Context; id: String);
    context variable for the identifier.  If this is not sufficient to identify
    the variable, add the variable name to the string.  *)
   BEGIN
-    NEW (context. id, Strings.Length (id)+1);
-    COPY (id, context. id^)
+    NEW (context. id, LEN (id$)+1);
+    context. id^ := id$
   END InitContext;
 
-PROCEDURE (context: Context) GetTemplate* (msg: Msg; VAR templ: LString);
+PROCEDURE (context: Context) GetTemplate* (msg: Msg; OUT templ: LString), NEW;
 (**Returns a template string for the message @oparam{msg}.  The string may
    contain attribute references.  Instead of the reference @samp{$@{foo@}}, the
    procedure @oproc{Msg.GetText} will insert the textual representation of the
@@ -195,17 +195,17 @@ PROCEDURE (context: Context) GetTemplate* (msg: Msg; VAR templ: LString);
    @end precond  *)
   VAR
     attrib: Attribute;
-    buffer: ARRAY sizeAttrReplacement+1 OF LONGCHAR;
+    buffer: ARRAY sizeAttrReplacement+1 OF CHAR;
   BEGIN
     (* default implementation: the template contains the context identifier,
        the error number, and the full list of attributes *)
-    COPY ("MSG_CONTEXT: ${MSG_CONTEXT}", templ);
+    templ := "MSG_CONTEXT: ${MSG_CONTEXT}";
     LongStrings.Append (CharClass.eol, templ);
     LongStrings.Append ("MSG_CODE: ${MSG_CODE}", templ);
     LongStrings.Append (CharClass.eol, templ);
     attrib := msg. attribList;
     WHILE (attrib # NIL) DO
-      COPY (attrib. name^, buffer);      (* extend to LONGCHAR *)
+      buffer := attrib. name^$;      (* extend to CHAR *)
       LongStrings.Append (buffer, templ);
       LongStrings.Append (": ${", templ);
       LongStrings.Append (buffer, templ);
@@ -219,20 +219,19 @@ PROCEDURE (context: Context) GetTemplate* (msg: Msg; VAR templ: LString);
 (* Attribute Functions
    ------------------------------------------------------------------------ *)
 
-PROCEDURE InitAttribute* (attr: Attribute; name: String);
+PROCEDURE InitAttribute* (attr: Attribute; IN name: String);
 (**Initializes attribute object and sets its name.  *)
   BEGIN
     attr. nextAttrib := NIL;
-    NEW (attr. name, Strings.Length (name)+1);
-    COPY (name, attr. name^)
+    NEW (attr. name, LEN (name$)+1);
+    attr. name^ := name$
   END InitAttribute;
 
-PROCEDURE (attr: Attribute) [ABSTRACT] ReplacementText* (VAR text: LString);
+PROCEDURE (attr: Attribute) ReplacementText* (OUT text: LString), NEW, ABSTRACT;
 (**Converts attribute value into some textual representation.  The length of
    the resulting string must not exceed @oconst{sizeAttrReplacement}
    characters: @oproc{Msg.GetLText} calls this procedure with a text buffer of
    @samp{@oconst{sizeAttrReplacement}+1} bytes.  *)
-  END ReplacementText;
 
 
 (* Message Functions
@@ -253,7 +252,7 @@ PROCEDURE New* (context: Context; code: Code): Msg;
     RETURN msg
   END New;
 
-PROCEDURE (msg: Msg) SetAttribute* (attr: Attribute);
+PROCEDURE (msg: Msg) SetAttribute* (attr: Attribute), NEW;
 (**Appends an attribute to the message's attribute list.  If an attribute of
    the same name exists already, it is replaced by the new one.
 
@@ -281,7 +280,7 @@ PROCEDURE (msg: Msg) SetAttribute* (attr: Attribute);
     Insert (msg. attribList, attr)
   END SetAttribute;
 
-PROCEDURE (msg: Msg) GetAttribute* (name: String): Attribute;
+PROCEDURE (msg: Msg) GetAttribute* (IN name: String): Attribute, NEW;
 (**Returns the attribute @oparam{name} of the message object.  If no such
    attribute exists, the value @code{NIL} is returned.  *)
   VAR
@@ -294,7 +293,7 @@ PROCEDURE (msg: Msg) GetAttribute* (name: String): Attribute;
     RETURN a
   END GetAttribute;
 
-PROCEDURE (msg: Msg) GetLText* (VAR text: LString);
+PROCEDURE (msg: Msg) GetLText* (OUT text: LString), NEW;
 (**Converts a message into a string.  The basic format of the string is
    determined by calling @oproc{msg.context.GetTemplate}.  Then the attributes
    are inserted into the template string: the placeholder string
@@ -308,26 +307,26 @@ PROCEDURE (msg: Msg) GetLText* (VAR text: LString);
    attribute reference.  *)
   VAR
     attr: Attribute;
-    attrName: ARRAY sizeAttrName+4 OF LONGCHAR;
-    insert: ARRAY sizeAttrReplacement+1 OF LONGCHAR;
+    attrName: ARRAY sizeAttrName+4 OF CHAR;
+    insert: ARRAY sizeAttrReplacement+1 OF CHAR;
     found: BOOLEAN;
     pos, len: INTEGER;
-    num: ARRAY 48 OF CHAR;
+    num: ARRAY 48 OF SHORTCHAR;
   BEGIN
     msg. context. GetTemplate (msg, text);
     attr := msg. attribList;
     WHILE (attr # NIL) DO
-      COPY (attr. name^, attrName);
+      attrName := attr. name^$;
       LongStrings.Insert ("${", 0, attrName);
       LongStrings.Append ("}", attrName);
       
       LongStrings.FindNext (attrName, text, 0, found, pos);
       WHILE found DO
-        len := LongStrings.Length (attrName);
+        len := LEN (attrName$);
         LongStrings.Delete (text, pos, len);
         attr. ReplacementText (insert);
         LongStrings.Insert (insert, pos, text);
-        LongStrings.FindNext (attrName, text, pos+LongStrings.Length (insert),
+        LongStrings.FindNext (attrName, text, pos+LEN (insert$),
                               found, pos)
       END;
       
@@ -337,7 +336,7 @@ PROCEDURE (msg: Msg) GetLText* (VAR text: LString);
     LongStrings.FindNext ("${MSG_CONTEXT}", text, 0, found, pos);
     IF found THEN
       LongStrings.Delete (text, pos, 14);
-      COPY (msg. context. id^, insert);
+      insert := msg. context. id^$;
       LongStrings.Insert (insert, pos, text)
     END;
     
@@ -345,12 +344,12 @@ PROCEDURE (msg: Msg) GetLText* (VAR text: LString);
     IF found THEN
       LongStrings.Delete (text, pos, 11);
       IntStr.IntToStr (msg. code, num);
-      COPY (num, insert);
+      insert := num$;
       LongStrings.Insert (insert, pos, text)
     END    
   END GetLText;
 
-PROCEDURE (msg: Msg) GetText* (VAR text: String);
+PROCEDURE (msg: Msg) GetText* (OUT text: String), NEW;
 (**Like @oproc{Msg.GetLText}, but the message text is truncated to ISO-Latin1
    characters.  All characters that are not part of ISO-Latin1 are mapped to
    question marks @samp{?}.  *)
@@ -390,7 +389,7 @@ PROCEDURE NewMsgList* (): MsgList;
     RETURN l
   END NewMsgList;
 
-PROCEDURE (l: MsgList) Append* (msg: Msg);
+PROCEDURE (l: MsgList) Append* (msg: Msg), NEW;
 (**Appends the message @oparam{msg} to the list @oparam{l}.
 
    @precond
@@ -409,7 +408,7 @@ PROCEDURE (l: MsgList) Append* (msg: Msg);
     INC (l. msgCount)
   END Append;
 
-PROCEDURE (l: MsgList) AppendList* (source: MsgList);
+PROCEDURE (l: MsgList) AppendList* (source: MsgList), NEW;
 (**Appends the messages of list @oparam{source} to @oparam{l}.  Afterwards,
    @oparam{source} is an empty list, and the elements of @oparam{source} can be
    found at the end of the list @oparam{l}.  *)
@@ -431,7 +430,7 @@ PROCEDURE (l: MsgList) AppendList* (source: MsgList);
 (* Standard Attributes
    ------------------------------------------------------------------------ *)
    
-PROCEDURE NewIntAttrib* (name: String; value: LONGINT): IntAttribute;
+PROCEDURE NewIntAttrib* (IN name: String; value: INTEGER): IntAttribute;
 (* pre: Length(name)<=sizeAttrName *)
   VAR
     attr: IntAttribute;
@@ -442,21 +441,21 @@ PROCEDURE NewIntAttrib* (name: String; value: LONGINT): IntAttribute;
     RETURN attr
   END NewIntAttrib;
 
-PROCEDURE (msg: Msg) SetIntAttrib* (name: String; value: LONGINT);
+PROCEDURE (msg: Msg) SetIntAttrib* (IN name: String; value: INTEGER), NEW;
 (* pre: Length(name)<=sizeAttrName *)
   BEGIN
     msg. SetAttribute (NewIntAttrib (name, value))
   END SetIntAttrib;
 
-PROCEDURE (attr: IntAttribute) ReplacementText* (VAR text: LString);
+PROCEDURE (attr: IntAttribute) ReplacementText* (OUT text: LString);
   VAR
-    num: ARRAY 48 OF CHAR;
+    num: ARRAY 48 OF SHORTCHAR;
   BEGIN
     IntStr.IntToStr (attr. int, num);
-    COPY (num, text)
+    text := num$
   END ReplacementText;
 
-PROCEDURE NewStringAttrib* (name: String; value: StringPtr): StringAttribute;
+PROCEDURE NewStringAttrib* (IN name: String; value: StringPtr): StringAttribute;
 (* pre: Length(name)<=sizeAttrName *)
   VAR
     attr: StringAttribute;
@@ -467,18 +466,18 @@ PROCEDURE NewStringAttrib* (name: String; value: StringPtr): StringAttribute;
     RETURN attr
   END NewStringAttrib;
 
-PROCEDURE (msg: Msg) SetStringAttrib* (name: String; value: StringPtr);
+PROCEDURE (msg: Msg) SetStringAttrib* (IN name: String; value: StringPtr), NEW;
 (* pre: Length(name)<=sizeAttrName *)
   BEGIN
     msg. SetAttribute (NewStringAttrib (name, value))
   END SetStringAttrib;
 
-PROCEDURE (attr: StringAttribute) ReplacementText* (VAR text: LString);
+PROCEDURE (attr: StringAttribute) ReplacementText* (OUT text: LString);
   BEGIN
-    COPY (attr. string^, text)
+    text := attr. string^$
   END ReplacementText;
 
-PROCEDURE NewLStringAttrib* (name: String; value: LStringPtr): LStringAttribute;
+PROCEDURE NewLStringAttrib* (IN name: String; value: LStringPtr): LStringAttribute;
 (* pre: Length(name)<=sizeAttrName *)
   VAR
     attr: LStringAttribute;
@@ -489,18 +488,18 @@ PROCEDURE NewLStringAttrib* (name: String; value: LStringPtr): LStringAttribute;
     RETURN attr
   END NewLStringAttrib;
 
-PROCEDURE (msg: Msg) SetLStringAttrib* (name: String; value: LStringPtr);
+PROCEDURE (msg: Msg) SetLStringAttrib* (IN name: String; value: LStringPtr), NEW;
 (* pre: Length(name)<=sizeAttrName *)
   BEGIN
     msg. SetAttribute (NewLStringAttrib (name, value))
   END SetLStringAttrib;
 
-PROCEDURE (attr: LStringAttribute) ReplacementText* (VAR text: LString);
+PROCEDURE (attr: LStringAttribute) ReplacementText* (OUT text: LString);
   BEGIN
-    COPY (attr. string^, text)
+    text := attr. string^$
   END ReplacementText;
 
-PROCEDURE NewMsgAttrib* (name: String; value: Msg): MsgAttribute;
+PROCEDURE NewMsgAttrib* (IN name: String; value: Msg): MsgAttribute;
 (* pre: Length(name)<=sizeAttrName *)
   VAR
     attr: MsgAttribute;
@@ -511,13 +510,13 @@ PROCEDURE NewMsgAttrib* (name: String; value: Msg): MsgAttribute;
     RETURN attr
   END NewMsgAttrib;
 
-PROCEDURE (msg: Msg) SetMsgAttrib* (name: String; value: Msg);
+PROCEDURE (msg: Msg) SetMsgAttrib* (IN name: String; value: Msg), NEW;
 (* pre: Length(name)<=sizeAttrName *)
   BEGIN
     msg. SetAttribute (NewMsgAttrib (name, value))
   END SetMsgAttrib;
 
-PROCEDURE (attr: MsgAttribute) ReplacementText* (VAR text: LString);
+PROCEDURE (attr: MsgAttribute) ReplacementText* (OUT text: LString);
   BEGIN
     attr. msg. GetLText (text)
   END ReplacementText;
@@ -527,23 +526,23 @@ PROCEDURE (attr: MsgAttribute) ReplacementText* (VAR text: LString);
 (* Auxiliary functions
    ------------------------------------------------------------------------ *)
 
-PROCEDURE GetStringPtr* (str: String): StringPtr;
+PROCEDURE GetStringPtr* (IN str: String): StringPtr;
 (**Creates a copy of @oparam{str} on the heap and returns a pointer to it.  *)
   VAR
     s: StringPtr;
   BEGIN
-    NEW (s, Strings.Length (str)+1);
-    COPY (str, s^);
+    NEW (s, LEN (str$)+1);
+    s^ := str$;
     RETURN s
   END GetStringPtr;
 
-PROCEDURE GetLStringPtr* (str: LString): LStringPtr;
+PROCEDURE GetLStringPtr* (IN str: LString): LStringPtr;
 (**Creates a copy of @oparam{str} on the heap and returns a pointer to it.  *)
   VAR
     s: LStringPtr;
   BEGIN
-    NEW (s, LongStrings.Length (str)+1);
-    COPY (str, s^);
+    NEW (s, LEN (str$)+1);
+    s^ := str$;
     RETURN s
   END GetLStringPtr;
 

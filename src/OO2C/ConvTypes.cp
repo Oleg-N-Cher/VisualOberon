@@ -1,9 +1,9 @@
-(*	$Id: ConvTypes.Mod,v 1.1 2002/05/10 22:25:18 mva Exp $	*)
+(*	$Id: ConvTypes.cp,v 1.1 2022/12/13 2:51:01 mva Exp $	*)
 MODULE ConvTypes;
 (**Common types used in the string conversion modules.  *)
  
 TYPE
-  ConvResults*= SHORTINT;
+  ConvResults*= BYTE;
   (**Values of this type are used to express the format of a string.  *)
 
 CONST
@@ -18,7 +18,7 @@ CONST
 
 
 TYPE
-  ScanClass*= SHORTINT;
+  ScanClass*= BYTE;
   (**Values of this type are used to classify input to finite state scanners.  *)
   
 CONST
@@ -36,7 +36,7 @@ TYPE
   ScanState*=POINTER TO ScanDesc; 
   ScanDesc*=RECORD
     (**The type of lexical scanning control procedures.  *)
-    p*: PROCEDURE (ch: CHAR; VAR cl: ScanClass; VAR st: ScanState);
+    p*: PROCEDURE (ch: SHORTCHAR; OUT cl: ScanClass; OUT st: ScanState);
     (**A procedure that produces the next state corresponding to the
        character @var{ch}.  The class of the character is returned
        in @var{cl}, the next state in @var{st}.  *)

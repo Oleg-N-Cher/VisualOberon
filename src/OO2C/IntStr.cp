@@ -1,4 +1,4 @@
-(*	$Id: IntStr.Mod,v 1.1 2002/05/12 21:58:14 mva Exp $	*)
+(*	$Id: IntStr.cp,v 1.1 2022/12/13 3:04:34 mva Exp $	*)
 MODULE IntStr;
 (*  IntStr - Integer-number/string conversions.       
     Copyright (C) 1995 Michael Griebling
@@ -41,7 +41,7 @@ CONST
      ["+" | "-"] decimal_digit {decimal_digit}
 *)
  
-PROCEDURE StrToInt*(str: ARRAY OF CHAR; VAR int: LONGINT; VAR res: ConvResults);
+PROCEDURE StrToInt*(IN str: ARRAY OF SHORTCHAR; VAR int: INTEGER; OUT res: ConvResults);
 (**Converts string to integer value.  Ignores any leading spaces in
    @oparam{str}.  If the subsequent characters in @oparam{str} are in the
    format of a signed whole number, assigns a corresponding value to
@@ -55,10 +55,10 @@ BEGIN
 END StrToInt;
 
 
-PROCEDURE Reverse (VAR str : ARRAY OF CHAR; start, end : INTEGER);
+PROCEDURE Reverse (VAR str : ARRAY OF SHORTCHAR; start, end : INTEGER);
 (* Reverses order of characters in the interval [start..end]. *)
 VAR
-  h : CHAR;
+  h : SHORTCHAR;
 BEGIN
   WHILE start < end DO
     h := str[start]; str[start] := str[end]; str[end] := h;
@@ -67,17 +67,17 @@ BEGIN
 END Reverse;
 
 
-PROCEDURE IntToStr*(int: LONGINT; VAR str: ARRAY OF CHAR);
+PROCEDURE IntToStr*(int: INTEGER; OUT str: ARRAY OF SHORTCHAR);
 (**Converts the value of @oparam{int} to string form and copies the possibly
    truncated result to @oparam{str}.  *)
 CONST
-  maxLength = 11; (* maximum number of digits representing a LONGINT value *)
+  maxLength = 11; (* maximum number of digits representing an INTEGER value *)
 VAR
-  b : ARRAY maxLength+1 OF CHAR;
+  b : ARRAY maxLength+1 OF SHORTCHAR;
   s, e: INTEGER;
 BEGIN
   (* build representation in string 'b' *)
-  IF int = MIN(LONGINT) THEN      (* smallest LONGINT, -int is an overflow *)
+  IF int = MIN(INTEGER) THEN      (* smallest INTEGER, -int is an overflow *)
     b := "-2147483648";
     e := 11
   ELSE
@@ -88,7 +88,7 @@ BEGIN
     END;
     e := s;                       (* 's' holds starting position of string *)
     REPEAT
-      b[e] := CHR(int MOD 10+ORD("0"));
+      b[e] := SHORT( CHR(int MOD 10+ORD("0")) );
       int := int DIV 10;
       INC(e)
     UNTIL int = 0;
@@ -96,7 +96,7 @@ BEGIN
     Reverse(b, s, e-1)
   END;
    
-  COPY(b, str) (* truncate output if necessary *)
+  str := b$ (* checking if the string will fit *)
 END IntToStr;
  
 END IntStr.

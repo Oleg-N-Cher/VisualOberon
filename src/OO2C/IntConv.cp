@@ -1,4 +1,4 @@
-(*	$Id: IntConv.Mod,v 1.6 2002/05/26 12:15:17 mva Exp $	*)
+(*	$Id: IntConv.cp,v 1.6 2022/12/13 2:58:31 mva Exp $	*)
 MODULE IntConv;
 (*
     IntConv -  Low-level integer/string conversions.       
@@ -42,7 +42,7 @@ CONST
 
 VAR
   W, S, SI: Conv.ScanState;
-  minInt, maxInt: ARRAY 11 OF CHAR;
+  minInt, maxInt: ARRAY 11 OF SHORTCHAR;
 
 CONST
   maxDigits = 10;                        (* length of minInt, maxInt *)
@@ -50,7 +50,7 @@ CONST
   
 (* internal state machine procedures *)
 
-PROCEDURE WState(inputCh: CHAR; VAR chClass: Conv.ScanClass; VAR nextState: Conv.ScanState);
+PROCEDURE WState(inputCh: SHORTCHAR; OUT chClass: Conv.ScanClass; OUT nextState: Conv.ScanState);
 BEGIN
   IF Char.IsNumeric(inputCh) THEN chClass:=Conv.valid; nextState:=W
   ELSE chClass:=Conv.terminator; nextState:=NIL
@@ -58,7 +58,7 @@ BEGIN
 END WState;
   
  
-PROCEDURE SState(inputCh: CHAR; VAR chClass: Conv.ScanClass; VAR nextState: Conv.ScanState);
+PROCEDURE SState(inputCh: SHORTCHAR; OUT chClass: Conv.ScanClass; OUT nextState: Conv.ScanState);
 BEGIN
   IF Char.IsNumeric(inputCh) THEN chClass:=Conv.valid; nextState:=W 
   ELSE chClass:=Conv.invalid; nextState:=S
@@ -66,7 +66,7 @@ BEGIN
 END SState;
 
   
-PROCEDURE ScanInt*(inputCh: CHAR; VAR chClass: Conv.ScanClass; VAR nextState: Conv.ScanState);
+PROCEDURE ScanInt*(inputCh: SHORTCHAR; OUT chClass: Conv.ScanClass; OUT nextState: Conv.ScanState);
  (**Represents the start state of a finite state scanner for signed whole
     numbers---assigns class of @oparam{inputCh} to @oparam{chClass} and a
     procedure representing the next state to @oparam{nextState}.
@@ -115,16 +115,16 @@ BEGIN
 END ScanInt;
  
  
-PROCEDURE FormatInt*(str: ARRAY OF CHAR): ConvResults;
-(**Returns the format of the string value for conversion to LONGINT.  *)
+PROCEDURE FormatInt*(IN str: ARRAY OF SHORTCHAR): ConvResults;
+(**Returns the format of the string value for conversion to INTEGER.  *)
 VAR
-  ch: CHAR;
+  ch: SHORTCHAR;
   index, start: INTEGER;
   state: Conv.ScanState;
   positive: BOOLEAN;
   prev, class: Conv.ScanClass;
 
-PROCEDURE LessOrEqual (VAR high: ARRAY OF CHAR; start, end: INTEGER): BOOLEAN;
+PROCEDURE LessOrEqual (IN high: ARRAY OF SHORTCHAR; start, end: INTEGER): BOOLEAN;
   VAR
     i: INTEGER;
   BEGIN  (* pre: index-start = maxDigits *)
@@ -182,13 +182,12 @@ BEGIN
 END FormatInt;
  
  
-PROCEDURE ValueInt*(str: ARRAY OF CHAR): LONGINT;
+PROCEDURE ValueInt*(IN str: ARRAY OF SHORTCHAR): INTEGER;
 (**Returns the value corresponding to the signed whole number string value 
    @oparam{str} if @oparam{str} is well-formed.  Otherwise, result is
    undefined.  *)
 VAR
-  i: INTEGER;
-  int: LONGINT;  
+  i, int: INTEGER;
   positive: BOOLEAN;
 BEGIN
   IF FormatInt(str)=strAllRight THEN
@@ -221,7 +220,7 @@ BEGIN
 END ValueInt;
 
 
-PROCEDURE LengthInt*(int: LONGINT): INTEGER;
+PROCEDURE LengthInt*(int: INTEGER): INTEGER;
 (**Returns the number of characters in the string representation of
    @oparam{int}.  This value corresponds to the capacity of an array @samp{str}
    which is of the minimum capacity needed to avoid truncation of the result in
@@ -229,7 +228,7 @@ PROCEDURE LengthInt*(int: LONGINT): INTEGER;
 VAR
   cnt: INTEGER;
 BEGIN
-  IF int=MIN(LONGINT) THEN
+  IF int=MIN(INTEGER) THEN
     RETURN maxDigits+1;
   ELSE
     IF int<=0 THEN int:=-int; cnt:=1 

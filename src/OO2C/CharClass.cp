@@ -1,6 +1,6 @@
-(*	$Id: CharClass.Mod,v 1.1 2002/04/15 22:42:48 mva Exp $	*)
+(*	$Id: CharClass.cp,v 1.1 2022/12/13 2:49:18 mva Exp $	*)
 MODULE CharClass;  
-(*  Classification of values of the type CHAR.
+(*  Classification of values of the type SHORTCHAR.
     Copyright (C) 1997-1998, 2002  Michael van Acken
 
     This module is free software; you can redistribute it and/or
@@ -27,48 +27,48 @@ CONST
      internally for OOC.  *)
 
 VAR
-  systemEol-: ARRAY 3 OF CHAR;
+  systemEol-: ARRAY 3 OF SHORTCHAR;
   (**End of line marker used by the target system for text files.  The string
      defined here can contain more than one character.  For one character eol
      markers, @ovar{systemEol} must not necessarily equal @oconst{eol}.  Note
      that the string cannot contain the termination character @code{0X}.  *)
 
 
-PROCEDURE IsNumeric* (ch: CHAR): BOOLEAN;
+PROCEDURE IsNumeric* (ch: SHORTCHAR): BOOLEAN;
 (**Returns @code{TRUE} if and only if @oparam{ch} is classified as a numeric
    character.  *)
   BEGIN
     RETURN ("0" <= ch) & (ch <= "9")
   END IsNumeric;
   
-PROCEDURE IsLetter* (ch: CHAR): BOOLEAN;
+PROCEDURE IsLetter* (ch: SHORTCHAR): BOOLEAN;
 (**Returns @code{TRUE} if and only if @oparam{ch} is classified as a letter.  *)
   BEGIN
     RETURN ("a" <= ch) & (ch <= "z") OR ("A" <= ch) & (ch <= "Z")
   END IsLetter;
   
-PROCEDURE IsUpper* (ch: CHAR): BOOLEAN;
+PROCEDURE IsUpper* (ch: SHORTCHAR): BOOLEAN;
 (**Returns @code{TRUE} if and only if @oparam{ch} is classified as an upper
    case letter.  *)
   BEGIN
     RETURN ("A" <= ch) & (ch <= "Z")
   END IsUpper;
   
-PROCEDURE IsLower* (ch: CHAR): BOOLEAN;
+PROCEDURE IsLower* (ch: SHORTCHAR): BOOLEAN;
 (**Returns @code{TRUE} if and only if @oparam{ch} is classified as a lower case
    letter.  *)
   BEGIN
     RETURN ("a" <= ch) & (ch <= "z")
   END IsLower;
   
-PROCEDURE IsControl* (ch: CHAR): BOOLEAN;
+PROCEDURE IsControl* (ch: SHORTCHAR): BOOLEAN;
 (**Returns @code{TRUE} if and only if @oparam{ch} represents a control
    function.  *)
   BEGIN
     RETURN (ch < Ascii.sp)
   END IsControl;
   
-PROCEDURE IsWhiteSpace* (ch: CHAR): BOOLEAN;
+PROCEDURE IsWhiteSpace* (ch: SHORTCHAR): BOOLEAN;
 (**Returns @code{TRUE} if and only if @oparam{ch} represents a space character
    or a format effector.  *)
   BEGIN
@@ -77,7 +77,7 @@ PROCEDURE IsWhiteSpace* (ch: CHAR): BOOLEAN;
   END IsWhiteSpace;
 
   
-PROCEDURE IsEol* (ch: CHAR): BOOLEAN;
+PROCEDURE IsEol* (ch: SHORTCHAR): BOOLEAN;
 (**Returns @code{TRUE} if and only if @oparam{ch} is the implementation-defined
    character used to represent end of line internally for OOC.  *) 
   BEGIN

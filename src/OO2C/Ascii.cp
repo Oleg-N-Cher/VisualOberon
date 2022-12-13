@@ -1,4 +1,4 @@
-(*	$Id: Ascii.Mod,v 1.2 2003/01/04 10:19:19 mva Exp $	*)
+(*	$Id: Ascii.cp,v 1.2 2003/01/04 10:19:19 mva Exp $	*)
 MODULE Ascii;
 (*  Standard short character names for control chars.
     Copyright (C) 2002  Michael van Acken
