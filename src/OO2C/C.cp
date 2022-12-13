@@ -1,5 +1,5 @@
-(* 	$Id: C.Mod,v 1.7 2002/11/29 23:17:19 mva Exp $	 *)
-MODULE C [INTERFACE "C"];
+(* 	$Id: C.cp,v 1.7 2022/12/13 16:58:39 mva Exp $	 *)
+MODULE [foreign] C (*INTERFACE "C"*);
 (*  Basic data types for interfacing to C code.
     Copyright (C) 1997-1998  Michael van Acken
 
@@ -26,16 +26,16 @@ IMPORT
    stick to a 32 Bit Unix they should be fairly safe.  *)  
 
 TYPE
-  char* = CHAR;
-  signedchar* = SHORTINT;                (* signed char *)
-  shortint* = INTEGER;                   (* short int *)
-  int* = LONGINT;
+  char* = SHORTCHAR;
+  signedchar* = BYTE;                    (* signed char *)
+  shortint* = SHORTINT;                  (* short int *)
+  int* = INTEGER;
   set* = SET;                            (* unsigned int, used as set *)
-  longint* = LONGINT;                    (* long int *)
-  longset* = SET;                        (* unsigned long, used as set *)
-  address* = SYSTEM.ADDRESS;
-  float* = REAL;
-  double* = LONGREAL;
+  longint* = SYSTEM.ADRINT;              (* long int *)
+  longset* = SYSTEM.ADRINT;              (* unsigned long, used as set *)
+  address* = SYSTEM.ADRINT;
+  float* = SHORTREAL;
+  double* = REAL;
 
   enum1* = int;
   enum2* = int;
@@ -43,25 +43,25 @@ TYPE
   
   (* if your C compiler uses short enumerations, you'll have to replace the
      declarations above with
-  enum1* = SHORTINT;
-  enum2* = INTEGER;
-  enum4* = LONGINT;
+  enum1* = BYTE;
+  enum2* = SHORTINT;
+  enum4* = INTEGER;
   *)
   
   FILE* = address;  (* this is acually a replacement for `FILE*', i.e., for a pointer type *)
-  size_t* = longint;
+  size_t* = address;
   uid_t* = int;
   gid_t* = int;
 
 
 TYPE  (* some commonly used C array types *)
-  charPtr1d* = POINTER TO ARRAY OF char;
-  charPtr2d* = POINTER TO ARRAY OF charPtr1d;
-  intPtr1d* = POINTER TO ARRAY OF int;
+  charPtr1d* = POINTER TO ARRAY [notag] OF char;
+  charPtr2d* = POINTER TO ARRAY [notag] OF charPtr1d;
+  intPtr1d* = POINTER TO ARRAY [notag] OF int;
 
 TYPE  (* C string type, assignment compatible with character arrays and
          string constants *)
-  string* = POINTER [CSTRING] TO ARRAY OF char;
+  string* = POINTER (*CSTRING*) TO ARRAY [notag] OF char;
   
 TYPE
   Proc* = PROCEDURE;
