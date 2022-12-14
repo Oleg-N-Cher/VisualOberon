@@ -41,6 +41,7 @@ CONST
 PROCEDURE- Boolean*(x: BOOLEAN): Hash;
 PROCEDURE- Real*(x: SHORTREAL): Hash;
 PROCEDURE- LongReal*(x: REAL): Hash;
+PROCEDURE- LongInt*(x: LONGINT): Hash;
 PROCEDURE- Set*(x: SET): Hash;
 PROCEDURE- Ptr*(x: SYSTEM.PTR): Hash;
 (* FIXME... there are more basic types ;-)  *)

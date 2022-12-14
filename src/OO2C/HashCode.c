@@ -50,6 +50,16 @@ HashCode_Hash HashCode_LongReal (REAL x) {
   return COMBINE(p.hash[0], p.hash[1]);
 }
 
+HashCode_Hash HashCode_LongInt (LONGINT x) {
+  union {
+    LONGINT lint;
+    HashCode_Hash hash[2];
+  } p;
+  
+  p.lint = x;
+  return COMBINE(p.hash[0], p.hash[1]);
+}
+
 HashCode_Hash HashCode_Set (SET x) {
   return AS_HASH(x);
 }
