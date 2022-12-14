@@ -1,5 +1,5 @@
-(*	$Id: HashCode.Mod,v 1.1 2003/05/30 16:06:40 mva Exp $	*)
-MODULE HashCode [FOREIGN "C"; LINK FILE "HashCode.c" END];
+(*	$Id: HashCode.cp,v 1.1 2022/12/14 4:19:04 mva Exp $	*)
+MODULE [foreign] HashCode (* FOREIGN "C"; LINK FILE "HashCode.c" END *);
 (*  Hash functions for basic types.
     Copyright (C) 2003  Michael van Acken
 
@@ -22,8 +22,9 @@ IMPORT
   SYSTEM;
   
 TYPE
-  Hash* = LONGINT;
+  Hash* = INTEGER;
   (**The integer type used to store hash values.  *)
+  UCS4CHAR = INTEGER;
 
 CONST
   init* = 257;
@@ -37,17 +38,17 @@ CONST
      END;
      @end example  *)
      
-PROCEDURE Boolean*(x: BOOLEAN): Hash;
-PROCEDURE Real*(x: REAL): Hash;
-PROCEDURE LongReal*(x: LONGREAL): Hash;
-PROCEDURE Set*(x: SET): Hash;
-PROCEDURE Ptr*(x: SYSTEM.PTR): Hash;
+PROCEDURE- Boolean*(x: BOOLEAN): Hash;
+PROCEDURE- Real*(x: SHORTREAL): Hash;
+PROCEDURE- LongReal*(x: REAL): Hash;
+PROCEDURE- Set*(x: SET): Hash;
+PROCEDURE- Ptr*(x: SYSTEM.PTR): Hash;
 (* FIXME... there are more basic types ;-)  *)
 
-PROCEDURE CharRegion*(data: ARRAY OF CHAR; start, end: LONGINT): Hash;
-PROCEDURE LongCharRegion*(data: ARRAY OF LONGCHAR; start, end: LONGINT): Hash;
-PROCEDURE UCS4CharRegion*(data: ARRAY OF UCS4CHAR; start, end: LONGINT): Hash;
+PROCEDURE- CharRegion*(IN data: ARRAY OF SHORTCHAR; start, end: INTEGER): Hash;
+PROCEDURE- LongCharRegion*(IN data: ARRAY OF CHAR; start, end: INTEGER): Hash;
+PROCEDURE- UCS4CharRegion*(IN data: ARRAY OF UCS4CHAR; start, end: INTEGER): Hash;
 
-PROCEDURE Append*(x: Hash; VAR hash: Hash);
+PROCEDURE- Append*(x: Hash; VAR hash: Hash);
   
 END HashCode.

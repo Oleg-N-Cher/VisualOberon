@@ -17,62 +17,65 @@
     59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "HashCode.d"
+#include "SYSTEM.oh"
+#include "HashCode.oh"
 
-#define SIZE_OF_HASH(x) (sizeof(x) == sizeof(HashCode__Hash))
-#define AS_HASH(x) ((HashCode__Hash)(x))
+typedef INTEGER HashCode_Hash;
+typedef INTEGER UCS4CHAR;
+
+#define AS_HASH(x) ((HashCode_Hash)(x))
 #define COMBINE(x,y) ((x)^(y))
 
-HashCode__Hash HashCode__Boolean(OOC_CHAR8 x) {
+HashCode_Hash HashCode_Boolean (BOOLEAN x) {
   return (x != 0)+1;
 }
 
-HashCode__Hash HashCode__Real(OOC_REAL32 x) {
+HashCode_Hash HashCode_Real (SHORTREAL x) {
   union {
-    OOC_REAL32 real;
-    HashCode__Hash hash;
+    SHORTREAL real;
+    HashCode_Hash hash;
   } p;
   
   p.real = x;
   return p.hash;
 }
 
-HashCode__Hash HashCode__LongReal(OOC_REAL64 x) {
+HashCode_Hash HashCode_LongReal (REAL x) {
   union {
-    OOC_REAL64 real;
-    HashCode__Hash hash[2];
+    REAL real;
+    HashCode_Hash hash[2];
   } p;
   
   p.real = x;
   return COMBINE(p.hash[0], p.hash[1]);
 }
 
-HashCode__Hash HashCode__Set(OOC_UINT32 x) {
+HashCode_Hash HashCode_Set (SET x) {
   return AS_HASH(x);
 }
 
-HashCode__Hash HashCode__Ptr(void* x) {
-  if (SIZE_OF_HASH(x)) {
-    return AS_HASH(x);  /* this causes a warning on 64 bit systems */
-  } else {
-    union {
-      void* ptr;
-      HashCode__Hash hash[2];
-    } p;
-    
-    p.ptr = x;
-    return COMBINE(p.hash[0], p.hash[1]);
-  }
+HashCode_Hash HashCode_Ptr (void* x) {
+#if (__SIZEOF_POINTER__ == 8) || defined (_LP64) || defined(__LP64__) || defined(_WIN64)
+  union {
+    void* ptr;
+    HashCode_Hash hash[2];
+  } p;
+
+  p.ptr = x;
+  return COMBINE(p.hash[0], p.hash[1]);  /* 64 bit systems */
+#else
+  return AS_HASH(x);  /* 32 bit systems */
+#endif
 }
 
-HashCode__Hash HashCode__CharRegion(const OOC_CHAR8 *data, OOC_LEN data_0d,
-				    OOC_INT32 start, OOC_INT32 end) {
+HashCode_Hash HashCode_CharRegion (CHAR *data, INTEGER data_0d,
+				    INTEGER start, INTEGER end) {
   /* taken from Python's dist/src/Objects/stringobject.c */
-  register OOC_CHAR8 *p, *s;
-  register HashCode__Hash x;
+  register CHAR *p, *s;
+  register HashCode_Hash x;
   
-  s = (OOC_CHAR8 *)(data+end);
-  p = (OOC_CHAR8 *)(data+start);
+  s = (CHAR *)(data+end);
+  p = (CHAR *)(data+start);
   if (p == s) {
     return 0;
   } else {
@@ -83,14 +86,14 @@ HashCode__Hash HashCode__CharRegion(const OOC_CHAR8 *data, OOC_LEN data_0d,
   }
 }
 
-HashCode__Hash HashCode__LongCharRegion(const OOC_CHAR16 *data,OOC_LEN data_0d,
-					OOC_INT32 start, OOC_INT32 end) {
+HashCode_Hash HashCode_LongCharRegion (LONGCHAR *data, INTEGER data_0d,
+					INTEGER start, INTEGER end) {
   /* taken from Python's dist/src/Objects/stringobject.c */
-  register OOC_CHAR16 *p, *s;
-  register HashCode__Hash x;
+  register LONGCHAR *p, *s;
+  register HashCode_Hash x;
   
-  s = (OOC_CHAR16 *)(data+end);
-  p = (OOC_CHAR16 *)(data+start);
+  s = (LONGCHAR *)(data+end);
+  p = (LONGCHAR *)(data+start);
   if (p == s) {
     return 0;
   } else {
@@ -101,14 +104,14 @@ HashCode__Hash HashCode__LongCharRegion(const OOC_CHAR16 *data,OOC_LEN data_0d,
   }
 }
 
-HashCode__Hash HashCode__UCS4CharRegion(const OOC_CHAR32 *data,OOC_LEN data_0d,
-					OOC_INT32 start, OOC_INT32 end) {
+HashCode_Hash HashCode_UCS4CharRegion (UCS4CHAR *data, INTEGER data_0d,
+					INTEGER start, INTEGER end) {
   /* taken from Python's dist/src/Objects/stringobject.c */
-  register OOC_CHAR32 *p, *s;
-  register HashCode__Hash x;
+  register UCS4CHAR *p, *s;
+  register HashCode_Hash x;
   
-  s = (OOC_CHAR32 *)(data+end);
-  p = (OOC_CHAR32 *)(data+start);
+  s = (UCS4CHAR *)(data+end);
+  p = (UCS4CHAR *)(data+start);
   if (p == s) {
     return 0;
   } else {
@@ -119,9 +122,6 @@ HashCode__Hash HashCode__UCS4CharRegion(const OOC_CHAR32 *data,OOC_LEN data_0d,
   }
 }
 
-void HashCode__Append(HashCode__Hash x, HashCode__Hash *hash) {
+void HashCode_Append (HashCode_Hash x, HashCode_Hash *hash) {
   *hash ^= x;
-}
-
-void OOC_HashCode_init() {
 }
