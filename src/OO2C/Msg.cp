@@ -83,7 +83,7 @@ TYPE
 
 TYPE
   Context* = POINTER TO ContextDesc;
-  ContextDesc* = RECORD
+  ContextDesc* = EXTENSIBLE RECORD
     (**Describes the context under which messages are converted into their
        textual representation.  Together, a message's context and its code
        identify the message type.  As a debugging aid, an identification string
@@ -171,7 +171,7 @@ PROCEDURE InitContext* (context: Context; IN id: String);
     context. id^ := id$
   END InitContext;
 
-PROCEDURE (context: Context) GetTemplate* (msg: Msg; OUT templ: LString), NEW;
+PROCEDURE (context: Context) GetTemplate* (msg: Msg; OUT templ: LString), NEW, EXTENSIBLE;
 (**Returns a template string for the message @oparam{msg}.  The string may
    contain attribute references.  Instead of the reference @samp{$@{foo@}}, the
    procedure @oproc{Msg.GetText} will insert the textual representation of the

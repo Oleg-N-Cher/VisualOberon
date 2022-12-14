@@ -1,5 +1,5 @@
-(* 	$Id: Channel.Mod,v 1.3 2002/12/19 06:36:46 mva Exp $	 *)
-MODULE Channel [OOC_EXTENSIONS];
+(* 	$Id: Channel.cp,v 1.3 2022/12/14 2:52:14 mva Exp $	 *)
+MODULE Channel (*OOC_EXTENSIONS*);
 (*  Provides abstract data types Channel, Reader, and Writer for stream I/O.
     Copyright (C) 1997-1999  Michael van Acken
 
@@ -72,9 +72,9 @@ MODULE Channel [OOC_EXTENSIONS];
    an error context (an instance of @otype{Msg.Context}) to translate any code
    into a human readable message.  *)
 
-<* Warnings := FALSE *>
+(* Warnings := FALSE *)
 IMPORT 
-  SYSTEM, Strings, Time, Msg;
+  Time, Msg;
   
 
 TYPE
@@ -158,22 +158,22 @@ CONST
 
 TYPE
   Channel* = POINTER TO ChannelDesc;
-  ChannelDesc* = RECORD [ABSTRACT]
-    res*: Result;       (* READ-ONLY *)
+  ChannelDesc* = ABSTRACT RECORD
+    res-: Result;       (* READ-ONLY *)
     (**Error flag signalling failure of a call to @oproc{Channel.NewReader},
        @oproc{Channel.NewWriter}, @oproc{Channel.Flush}, or
        @oproc{Channel.Close}.  Initialized to @oconst{done} when creating the
        channel.  Every operation sets this to @oconst{done} on success, or to a
        message object to indicate the error source.  *)
     
-    readable*: BOOLEAN;  (* READ-ONLY *)
+    readable-: BOOLEAN;  (* READ-ONLY *)
     (**@code{TRUE} iff readers can be attached to this channel with
        @oproc{Channel.NewReader}.  *)
-    writable*: BOOLEAN;  (* READ-ONLY *)
+    writable-: BOOLEAN;  (* READ-ONLY *)
     (**@code{TRUE} iff writers can be attached to this channel with
        @oproc{Channel.NewWriter}.  *)
     
-    open*: BOOLEAN;  (* READ-ONLY *)
+    open-: BOOLEAN;  (* READ-ONLY *)
     (**Channel status.  Set to @code{TRUE} on channel creation, set to
        @code{FALSE} by calling @oproc{Channel.Close}.  Closing a channel
        prevents all further read or write operations on it.  *)
@@ -181,11 +181,11 @@ TYPE
 
 TYPE
   Reader* = POINTER TO ReaderDesc;
-  ReaderDesc* = RECORD [ABSTRACT]
-    base*: Channel;  (* READ-ONLY *)
+  ReaderDesc* = ABSTRACT RECORD
+    base-: Channel;  (* READ-ONLY *)
     (**This field refers to the channel the @otype{Reader} is connected to.  *)
 
-    res*: Result;   (* READ-ONLY *)
+    res-: Result;   (* READ-ONLY *)
     (**Error flag signalling failure of a call to @oproc{Reader.ReadByte},
        @oproc{Reader.ReadBytes}, or @oproc{Reader.SetPos}.  Initialized to
        @oconst{done} when creating a @otype{Reader} or by calling
@@ -198,11 +198,11 @@ TYPE
        asserting that @ofield{res} equals @oconst{done} beforehand and also
        after the last operation.  *)
     
-    bytesRead*: LONGINT;  (* READ-ONLY *)
+    bytesRead-: INTEGER;  (* READ-ONLY *)
     (**Set by @oproc{Reader.ReadByte} and @oproc{Reader.ReadBytes} to indicate
        the number of bytes that were successfully read.  *)
        
-    positionable*: BOOLEAN;  (* READ-ONLY *)
+    positionable-: BOOLEAN;  (* READ-ONLY *)
     (**@code{TRUE} iff the Reader can be moved to another position with
        @oproc{Reader.SetPos}; for channels that can only be read sequentially, like
        input from keyboard, this is @code{FALSE}.  *)
@@ -210,11 +210,11 @@ TYPE
 
 TYPE
   Writer* = POINTER TO WriterDesc;
-  WriterDesc* = RECORD [ABSTRACT]
-    base*: Channel;  (* READ-ONLY *)
+  WriterDesc* = ABSTRACT RECORD
+    base-: Channel;  (* READ-ONLY *)
     (**This field refers to the channel the @otype{Writer} is connected to.  *)
 
-    res*: Result;   (* READ-ONLY *)
+    res-: Result;   (* READ-ONLY *)
     (**Error flag signalling failure of a call to @oproc{Writer.WriteByte},
        @oproc{Writer.WriteBytes}, or @oproc{Writer.SetPos}.  Initialized to
        @oconst{done} when creating a @otype{Writer} or by calling
@@ -230,11 +230,11 @@ TYPE
        the channel's @ofield{res} field after any @oproc{Channel.Flush} or the
        final @oproc{Channel.Close}, too.  *)
      
-    bytesWritten*: LONGINT;  (* READ-ONLY *)
+    bytesWritten-: INTEGER;  (* READ-ONLY *)
     (**Set by @oproc{Writer.WriteByte} and @oproc{Writer.WriteBytes} to
        indicate the number of bytes that were successfully written.  *)
        
-    positionable*: BOOLEAN;  (* READ-ONLY *)
+    positionable-: BOOLEAN;  (* READ-ONLY *)
     (**@code{TRUE} iff the Writer can be moved to another position with
        @oproc{Writer.SetPos}.  for channels that can only be written
        sequentially, like output to terminal, this is @code{FALSE}.  *)
@@ -257,7 +257,7 @@ PROCEDURE GetError (code: Msg.Code): Result;
     RETURN Msg.New (errorContext, code)
   END GetError;
 
-PROCEDURE (context: ErrorContext) GetTemplate* (msg: Msg.Msg; VAR templ: Msg.LString);
+PROCEDURE (context: ErrorContext) GetTemplate* (msg: Msg.Msg; OUT templ: Msg.LString);
 (**Translates this module's error codes into strings.  The string usually
    contains a short error description, possibly followed by some attributes
    to provide additional information for the problem.
@@ -265,7 +265,7 @@ PROCEDURE (context: ErrorContext) GetTemplate* (msg: Msg.Msg; VAR templ: Msg.LSt
    The method should not be called directly by the user.  It is invoked by
    @samp{res.GetText()} or @samp{res.GetLText}.  *)
   VAR
-    str: ARRAY 128 OF CHAR;
+    str: ARRAY 128 OF SHORTCHAR;
   BEGIN
     CASE msg. code OF
     | invalidChannel: str := "Invalid channel descriptor"
@@ -286,7 +286,7 @@ PROCEDURE (context: ErrorContext) GetTemplate* (msg: Msg.Msg; VAR templ: Msg.LSt
     ELSE
       str := "[unknown error code]"
     END;
-    COPY (str, templ)
+    templ := str$
   END GetTemplate;
 
 
@@ -294,16 +294,15 @@ PROCEDURE (context: ErrorContext) GetTemplate* (msg: Msg.Msg; VAR templ: Msg.LSt
 (* Reader methods 
    ------------------------------------------------------------------------ *)
 
-PROCEDURE (r: Reader) [ABSTRACT] Pos*(): LONGINT;
+PROCEDURE (r: Reader) Pos*(): INTEGER, NEW, ABSTRACT;
 (**Returns the current reading position associated with the reader @oparam{r}
    in channel @ofield{r.base}, i.e. the index of the first byte that is read by
    the next call to @oproc{Reader.ReadByte} resp. @oproc{Reader.ReadBytes}.
    This procedure will return @oconst{noPosition} if the reader has no concept
    of a reading position (e.g. if it corresponds to input from keyboard),
    otherwise the result is not negative.  *)
-  END Pos;
 
-PROCEDURE (r: Reader) [ABSTRACT] Available*(): LONGINT;
+PROCEDURE (r: Reader) Available*(): INTEGER, NEW, ABSTRACT;
 (**Returns the number of bytes available for the next reading operation.  For a
    file this is the length of the channel @ofield{r.base} minus the current
    reading position, for an sequential channel (or a channel designed to handle
@@ -327,9 +326,8 @@ PROCEDURE (r: Reader) [ABSTRACT] Available*(): LONGINT;
       RETURN -1
     END
     *)
-  END Available;
   
-PROCEDURE (r: Reader) [ABSTRACT] SetPos* (newPos: LONGINT);
+PROCEDURE (r: Reader) SetPos* (newPos: INTEGER), NEW, ABSTRACT;
 (**Sets the reading position to @oparam{newPos}.  A negative value of
    @oparam{newPos} or calling this procedure for a reader that doesn't allow
    positioning will set @ofield{r.res} to @oconst{outOfRange}.  A value larger
@@ -351,9 +349,8 @@ PROCEDURE (r: Reader) [ABSTRACT] SetPos* (newPos: LONGINT);
       END
     END
     *)
-  END SetPos;
   
-PROCEDURE (r: Reader) [ABSTRACT] ReadByte* (VAR x: SYSTEM.BYTE);
+PROCEDURE (r: Reader) ReadByte* (OUT x: BYTE), NEW, ABSTRACT;
 (**Reads a single byte from the channel @ofield{r.base} at the reading position
    associated with @oparam{r} and places it in @oparam{x}.  The reading
    position is moved forward by one byte on success, otherwise @ofield{r.res}
@@ -375,10 +372,9 @@ PROCEDURE (r: Reader) [ABSTRACT] ReadByte* (VAR x: SYSTEM.BYTE);
       r. bytesRead := 0
     END
     *)
-  END ReadByte;
   
-PROCEDURE (r: Reader) [ABSTRACT] ReadBytes* (VAR x: ARRAY OF SYSTEM.BYTE; 
-                                             start, n: LONGINT);
+PROCEDURE (r: Reader) ReadBytes* (OUT x: ARRAY OF BYTE; 
+                                  start, n: INTEGER), NEW, ABSTRACT;
 (**Reads @oparam{n} bytes from the channel @ofield{r.base} at the reading
    position associated with @oparam{r} and places them in @oparam{x}, starting
    at index @oparam{start}.  The reading position is moved forward by
@@ -407,9 +403,8 @@ PROCEDURE (r: Reader) [ABSTRACT] ReadBytes* (VAR x: ARRAY OF SYSTEM.BYTE;
       r. bytesRead := 0
     END
     *)
-  END ReadBytes;
   
-PROCEDURE (r: Reader) ClearError*;
+PROCEDURE (r: Reader) ClearError*, NEW;
 (**Sets the result flag @ofield{r.res} to @oconst{done}, re-enabling further
    read operations on @oparam{r}.  *)
   BEGIN
@@ -422,16 +417,15 @@ PROCEDURE (r: Reader) ClearError*;
 (* Writer methods 
    ------------------------------------------------------------------------ *)
 
-PROCEDURE (w: Writer) [ABSTRACT] Pos*(): LONGINT;
+PROCEDURE (w: Writer) Pos*(): INTEGER, NEW, ABSTRACT;
 (**Returns the current writing position associated with the writer @oparam{w}
    in channel @ofield{w.base}, i.e. the index of the first byte that is written
    by the next call to @oproc{Writer.WriteByte} or @oproc{Writer.WriteBytes}.
    This procedure will return @oconst{noPosition} if the writer has no concept
    of a writing position (e.g. if it corresponds to output to terminal),
    otherwise the result is not negative.  *)
-  END Pos;
   
-PROCEDURE (w: Writer) [ABSTRACT] SetPos* (newPos: LONGINT);
+PROCEDURE (w: Writer) SetPos* (newPos: INTEGER), NEW, ABSTRACT;
 (**Sets the writing position to @oparam{newPos}.  A negative value of
    @oparam{newPos} or calling this procedure for a writer that doesn't allow
    positioning will set `w.res' to @oconst{outOfRange}.  A value larger than
@@ -450,9 +444,8 @@ PROCEDURE (w: Writer) [ABSTRACT] SetPos* (newPos: LONGINT);
       END
     END
     *)
-  END SetPos;
   
-PROCEDURE (w: Writer) [ABSTRACT] WriteByte* (x: SYSTEM.BYTE);
+PROCEDURE (w: Writer) WriteByte* (x: BYTE), NEW, ABSTRACT;
 (**Writes a single byte @oparam{x} to the channel @ofield{w.base} at the
    writing position associated with @oparam{w}.  The writing position is moved
    forward by one byte on success, otherwise @ofield{w.res} is changed to
@@ -472,10 +465,9 @@ PROCEDURE (w: Writer) [ABSTRACT] WriteByte* (x: SYSTEM.BYTE);
       w. bytesWritten := 0
     END
     *)
-  END WriteByte;
   
-PROCEDURE (w: Writer) [ABSTRACT] WriteBytes* (x: ARRAY OF SYSTEM.BYTE;
-                                              start, n: LONGINT);
+PROCEDURE (w: Writer) WriteBytes* (IN x: ARRAY OF BYTE;
+                                   start, n: INTEGER), NEW, ABSTRACT;
 (**Writes @oparam{n} bytes from @oparam{x}, starting at position
    @oparam{start}, to the channel @ofield{w.base} at the writing position
    associated with @oparam{w}.  The writing position is moved forward by
@@ -501,9 +493,8 @@ PROCEDURE (w: Writer) [ABSTRACT] WriteBytes* (x: ARRAY OF SYSTEM.BYTE;
       w. bytesWritten := 0
     END
     *)
-  END WriteBytes;
   
-PROCEDURE (w: Writer) ClearError*;
+PROCEDURE (w: Writer) ClearError*, NEW;
 (**Sets the result flag @ofield{w.res} to @oconst{done}, re-enabling further
    write operations on @oparam{w}.  *)
   BEGIN
@@ -513,23 +504,21 @@ PROCEDURE (w: Writer) ClearError*;
     
 
 
-(* Channel methods 
+(* Channel methods
    ------------------------------------------------------------------------ *)
    
-PROCEDURE (ch: Channel) [ABSTRACT] Length*(): LONGINT;
+PROCEDURE (ch: Channel) Length*(): INTEGER, NEW, ABSTRACT;
 (**Result is the number of bytes of data that this channel refers to.  If
    @oparam{ch} represents a file, then this value is the file's size.  If
    @oparam{ch} has no fixed length (e.g. because it's interactive), the result
    is @oconst{noLength}.  *)
-  END Length;
   
-PROCEDURE (ch: Channel) [ABSTRACT] GetModTime* (VAR mtime: Time.TimeStamp);
+PROCEDURE (ch: Channel) GetModTime* (OUT mtime: Time.TimeStamp), NEW, ABSTRACT;
 (**Retrieves the modification time of the data accessed by the given channel.
    If no such information is avaiblable, @ofield{ch.res} is set to
    @oconst{noModTime}, otherwise to @oconst{done}.  *)
-  END GetModTime;
 
-PROCEDURE (ch: Channel) NewReader*(): Reader;
+PROCEDURE (ch: Channel) NewReader*(): Reader, NEW;
 (**Attaches a new reader to the channel @oparam{ch}.  It is placed at the very
    start of the channel, and its @ofield{Reader.res} field is initialized to
    @oconst{done}.  @ofield{ch.res} is set to @oconst{done} on success and the
@@ -560,7 +549,7 @@ PROCEDURE (ch: Channel) NewReader*(): Reader;
     RETURN NIL
   END NewReader;
   
-PROCEDURE (ch: Channel) NewWriter*(): Writer;
+PROCEDURE (ch: Channel) NewWriter*(): Writer, NEW;
 (**Attaches a new writer to the channel @oparam{ch}.  It is placed at the very
    start of the channel, and its @ofield{Writer.res} field is initialized to
    @oconst{done}.  @ofield{ch.res} is set to @oconst{done} on success and the
@@ -591,7 +580,7 @@ PROCEDURE (ch: Channel) NewWriter*(): Writer;
     RETURN NIL
   END NewWriter;
   
-PROCEDURE (ch: Channel) [ABSTRACT] Flush*;
+PROCEDURE (ch: Channel) Flush*, NEW, ABSTRACT;
 (**Flushes all buffers related to this channel.  Any pending write operations
    are passed to the underlying OS and all buffers are marked as invalid.  The
    next read operation will get its data directly from the channel instead of
@@ -609,9 +598,8 @@ PROCEDURE (ch: Channel) [ABSTRACT] Flush*;
       ch. ClearError
     END
     *)
-  END Flush;
 
-PROCEDURE (ch: Channel) [ABSTRACT] Close*;
+PROCEDURE (ch: Channel) Close*, NEW, ABSTRACT;
 (**Flushes all buffers associated with @oparam{ch}, closes the channel, and
    frees all system resources allocated to it.  This invalidates all riders
    attached to @oparam{ch}, and they can't be used further.  On success,
@@ -629,9 +617,8 @@ PROCEDURE (ch: Channel) [ABSTRACT] Close*;
     END;
     ch. open := FALSE
     *)
-  END Close;
 
-PROCEDURE (ch: Channel) ClearError*;
+PROCEDURE (ch: Channel) ClearError*, NEW;
 (**Sets the result flag @ofield{ch.res} to @oconst{done}.  *)
   BEGIN
     ch. res := done

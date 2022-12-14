@@ -7,10 +7,10 @@ SET AR=ar.exe -rc ..\OO2C.a
 IF EXIST ..\OO2C.a DEL ..\OO2C.a
 
 %CC% Ascii.c CharClass.c ConvTypes.c IntConv.c IntStr.c LongStrings.c ^
-  Msg.c Strings.c ..\..\..\src\OO2C\SysClock.c Time.c
+  Msg.c Strings.c ..\..\..\src\OO2C\SysClock.c Time.c Channel.c
 
 IF errorlevel 1 PAUSE
 %AR% Ascii.o CharClass.o ConvTypes.o IntConv.o IntStr.o LongStrings.o ^
-  Msg.o Strings.o SysClock.o Time.o
+  Msg.o Strings.o SysClock.o Time.o Channel.o
 
 DEL /Q *.o
