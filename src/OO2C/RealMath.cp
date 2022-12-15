@@ -1,6 +1,6 @@
-(* 	$Id: RealMath.Mod,v 1.10 2003/08/09 06:17:48 mva Exp $	 *)
-MODULE RealMath [INTERFACE "C"
-  <* IF HAVE_LIB_M THEN *> ; LINK LIB "m" END <* END *> ];
+(* 	$Id: RealMath.cp,v 1.10 2022/12/15 5:30:24 mva Exp $	 *)
+MODULE [foreign] RealMath (* INTERFACE "C"
+  <* IF HAVE_LIB_M THEN *> ; LINK LIB "m" END <* END *> *);
 (*  Math functions for REAL.
     Copyright (C) 2002,2003  Michael van Acken
 
@@ -25,73 +25,74 @@ MODULE RealMath [INTERFACE "C"
    with some C level type cast trickery, which prevent them from being
    used in a procedure variable, but should work fine otherwise.  *)
 
-IMPORT  <*Warnings:=FALSE*>
-  LRealMath;  (* unused but mandatory *)
+IMPORT SYSTEM;
 
 CONST
-  pi*   = 3.1415926535897932384626433832795028841972E0;
-  exp1* = 2.7182818284590452353602874713526624977572E0;
+  pi*   = SHORT( 3.1415926535897932384626433832795028841972E0 );
+  exp1* = SHORT( 2.7182818284590452353602874713526624977572E0 );
 
 
-PROCEDURE ["(float)sqrt"] sqrt*(x: REAL): REAL;
+PROCEDURE- Aincludemath- "#include <math.h>";
+
+PROCEDURE- sqrt* (x: SHORTREAL): SHORTREAL "(float)sqrt(x)";
 (**Returns the positive square root of x where x >= 0.  *)
 
-PROCEDURE ["(float)exp"] exp*(x: REAL): REAL;
-(**Returns the exponential of x for x < Ln(MAX(REAL).  *)
+PROCEDURE- exp* (x: SHORTREAL): SHORTREAL "(float)exp(x)";
+(**Returns the exponential of x for x < Ln(MAX(SHORTREAL).  *)
 
-PROCEDURE ["(float)log"] ln*(x: REAL): REAL;
+PROCEDURE- ln* (x: SHORTREAL): SHORTREAL "(float)log(x)";
 (**Returns the natural logarithm of x for x > 0.  *)
 
-PROCEDURE ["(float)sin"] sin* (x: REAL): REAL;
+PROCEDURE- sin* (x: SHORTREAL): SHORTREAL "(float)sin(x)";
 
-PROCEDURE ["(float)cos"] cos* (x: REAL): REAL;
+PROCEDURE- cos* (x: SHORTREAL): SHORTREAL "(float)cos(x)";
  
-PROCEDURE ["(float)tan"] tan*(x: REAL): REAL;
+PROCEDURE- tan* (x: SHORTREAL): SHORTREAL "(float)tan(x)";
 (**Returns the tangent of x where x cannot be an odd multiple of pi/2.  *)
  
-PROCEDURE ["(float)asin"] arcsin*(x: REAL): REAL;
+PROCEDURE- arcsin* (x: SHORTREAL): SHORTREAL "(float)asin(x)";
 (**Returns the arcsine of x, in the range [-pi/2, pi/2] where -1 <= x <= 1.  *)
  
-PROCEDURE ["(float)acos"] arccos*(x: REAL): REAL;
+PROCEDURE- arccos* (x: SHORTREAL): SHORTREAL "(float)acos(x)";
 (**Returns the arccosine of x, in the range [0, pi] where -1 <= x <= 1.  *)
 
-PROCEDURE ["(float)atan"] arctan*(x: REAL): REAL;
+PROCEDURE- arctan* (x: SHORTREAL): SHORTREAL "(float)atan(x)";
 (**Returns the arctangent of x, in the range [-pi/2, pi/2] for all x.  *)
  
-PROCEDURE ["(float)pow"] power*(base, exponent: REAL): REAL;
+PROCEDURE- power* (base, exponent: SHORTREAL): SHORTREAL "(float)pow(base, exponent)";
 (**Returns the value of the number base raised to the power exponent 
      for base > 0.  *)
 
-PROCEDURE ["ooc_round_real32"] round*(x: REAL): LONGINT;
+PROCEDURE- round* (x: SHORTREAL): INTEGER "((x)>=0.0f?(INTEGER)(x+0.5f):(INTEGER)(x-0.5f))";
 (**Returns the value of x rounded to the nearest integer.  *)
 
-PROCEDURE ["(float)sincos"] sincos* (x: REAL; VAR sin, cos: REAL);
+PROCEDURE- sincos* (x: SHORTREAL; OUT sin, cos: SHORTREAL) "(float)sincos(x, sin, cos)";
 (**More efficient sin/cos implementation if both values are needed.  *)
 
-PROCEDURE ["(float)atan2"] arctan2* (xn, xd: REAL): REAL;
+PROCEDURE- arctan2* (xn, xd: SHORTREAL): SHORTREAL "(float)atan2(xn, xd)";
 (**arctan2(xn,xd) is the quadrant-correct arc tangent atan(xn/xd).  If the 
    denominator xd is zero, then the numerator xn must not be zero.  All
    arguments are legal except xn = xd = 0.  *)
 
-PROCEDURE ["(float)sinh"] sinh* (x: REAL): REAL;
+PROCEDURE- sinh* (x: SHORTREAL): SHORTREAL "(float)sinh(x)";
 (**sinh(x) is the hyperbolic sine of x.  The argument x must not be so large 
    that exp(|x|) overflows.  *)
 
-PROCEDURE ["(float)cosh"] cosh* (x: REAL): REAL;
+PROCEDURE- cosh* (x: SHORTREAL): SHORTREAL "(float)cosh(x)";
 (**cosh(x) is the hyperbolic cosine of x.  The argument x must not be so large
    that exp(|x|) overflows.  *)   
 
-PROCEDURE ["(float)tanh"] tanh* (x: REAL): REAL;
+PROCEDURE- tanh* (x: SHORTREAL): SHORTREAL "(float)tanh(x)";
 (**tanh(x) is the hyperbolic tangent of x.  All arguments are legal.  *)
 
-PROCEDURE ["(float)asinh"] arcsinh* (x: REAL): REAL;
+PROCEDURE- arcsinh* (x: SHORTREAL): SHORTREAL "(float)asinh(x)";
 (**arcsinh(x) is the arc hyperbolic sine of x.  All arguments are legal.  *)
 
-PROCEDURE ["(float)acosh"] arccosh* (x: REAL): REAL;
+PROCEDURE- arccosh* (x: SHORTREAL): SHORTREAL "(float)acosh(x)";
 (**arccosh(x) is the arc hyperbolic cosine of x.  All arguments greater than 
    or equal to 1 are legal.  *)
    
-PROCEDURE ["(float)tanh"] arctanh* (x: REAL): REAL;
+PROCEDURE- arctanh* (x: SHORTREAL): SHORTREAL "(float)tanh(x)";
 (**arctanh(x) is the arc hyperbolic tangent of x.  |x| < 1 - sqrt(em), where 
    em is machine epsilon.  Note that |x| must not be so close to 1 that the 
    result is less accurate than half precision.  *)
