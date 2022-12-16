@@ -2,7 +2,7 @@
   This class iimplements the necessary classes for drag and drop data exchange.
 **)
 
-MODULE VO:Base:DragDrop;
+MODULE VO_Base_DragDrop;
 
 (*
     Classes for drag and drop data exchange.
@@ -22,6 +22,8 @@ MODULE VO:Base:DragDrop;
     License along with VisualOberon. If not, write to the Free Software Foundation,
     59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 *)
+
+IMPORT Object;
 
 CONST
 
@@ -54,14 +56,16 @@ CONST
 
 TYPE
 
+  STRING = Object.String;
+
   (**
     Represents entry in the datatype table of DnDdataInfo.
   **)
 
   DnDDataInfoEntryDesc* = RECORD
-                            group-,type-   : LONGINT;
+                            group-,type-   : INTEGER;
                             actions-       : SET;
-                            defaultAction- : LONGINT;
+                            defaultAction- : INTEGER;
                           END;
 
   DnDDataInfoList = POINTER TO ARRAY OF DnDDataInfoEntryDesc;
@@ -80,7 +84,7 @@ TYPE
 
   DnDDataInfoDesc* = RECORD
                        entries- : DnDDataInfoList;
-                       count-   : LONGINT;
+                       count-   : INTEGER;
                      END;
 
   DnDData*     = POINTER TO DnDDataDesc;
@@ -89,7 +93,7 @@ TYPE
     Baseclass for all drag and drop data exchange.
   **)
 
-  DnDDataDesc* = RECORD
+  DnDDataDesc* = EXTENSIBLE RECORD
                  END;
 
   DnDStringData*     = POINTER TO DnDStringDataDesc;
@@ -106,7 +110,7 @@ TYPE
     Initialisation. Must be called before first use.
   **)
 
-  PROCEDURE (d : DnDDataInfo) Init*;
+  PROCEDURE (d : DnDDataInfo) Init*, NEW;
 
   BEGIN
     NEW(d.entries,initialListSize);
@@ -120,12 +124,12 @@ TYPE
     pysical structure (image/gif) or or the logical structure (text/file).
   **)
 
-  PROCEDURE (d : DnDDataInfo) AddDataType*(group, type : LONGINT;
-                                           actions : SET; defaultAction : LONGINT);
+  PROCEDURE (d : DnDDataInfo) AddDataType*(group, type : INTEGER;
+                                           actions : SET; defaultAction : INTEGER), NEW;
 
   VAR
     help : DnDDataInfoList;
-    x    : LONGINT;
+    x    : INTEGER;
 
   BEGIN
     IF d.count>=LEN(d.entries^) THEN
@@ -151,10 +155,10 @@ TYPE
     be returned if found.
   **)
 
-  PROCEDURE (d : DnDDataInfo) FindDataType*(VAR group,type,action : LONGINT):BOOLEAN;
+  PROCEDURE (d : DnDDataInfo) FindDataType*(VAR group,type,action : INTEGER):BOOLEAN, NEW;
 
   VAR
-    x : LONGINT;
+    x : INTEGER;
 
   BEGIN
     FOR x:=0 TO d.count-1 DO
@@ -175,4 +179,4 @@ TYPE
   END FindDataType;
 
 
-END VO:Base:DragDrop.
+END VO_Base_DragDrop.

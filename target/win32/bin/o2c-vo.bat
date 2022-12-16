@@ -5,7 +5,7 @@ SET OBERON=.;..\sym;..\..\..\src
 
 :: VO_Base
 
-ofront+ -sO88 ^
+ofront+ -sO48 ^
   VO_Base_DragDrop.cp
 IF errorlevel 1 PAUSE
 
