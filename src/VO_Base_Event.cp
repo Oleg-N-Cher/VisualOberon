@@ -11,7 +11,7 @@
     qualifiers explicitely..
 **)
 
-MODULE VO:Base:Event [OOC_EXTENSIONS];
+MODULE VO_Base_Event (*OOC_EXTENSIONS*);
 
 (*
     Classhierachie defining a number of OS-independend messgaes.
@@ -32,7 +32,7 @@ MODULE VO:Base:Event [OOC_EXTENSIONS];
     59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 *)
 
-IMPORT U := VO:Base:Util(*,
+IMPORT U := VO_Base_Util(*,
 
        xk := X11:Xkeysymdef*);
 
@@ -145,7 +145,7 @@ CONST
 
 TYPE
   Event*          = POINTER TO EventDesc;
-  EventDesc*      = RECORD [ABSTRACT]
+  EventDesc*      = ABSTRACT RECORD
   (**
     Baseclass for events. Currently all objects get a instance
     of this baseclass and then have to analyse the message by
@@ -157,42 +157,42 @@ TYPE
                     END;
 
   KeyEvent*       = POINTER TO KeyEventDesc;
-  KeyEventDesc*   = RECORD [ABSTRACT] (EventDesc)
+  KeyEventDesc*   = ABSTRACT RECORD (EventDesc)
   (**
     Keyboard event. The application receives this event when a key
     has been pressed or raised.
   *)
-                      key*       : LONGINT; (** the keycode *)
-                      qualifier* : SET;     (** the current key and mouse qualifiers *)
-                      text*      : U.Text;  (** the ASCII-string corresponding to the keyboard event *)
-                      textLength*: LONGINT; (** length of the text *)
-                      type*      : INTEGER; (** type of key event *)
+                      key*       : INTEGER;  (** the keycode *)
+                      qualifier* : SET;      (** the current key and mouse qualifiers *)
+                      text*      : U.Text;   (** the ASCII-string corresponding to the keyboard event *)
+                      textLength*: INTEGER;  (** length of the text *)
+                      type*      : SHORTINT; (** type of key event *)
                     END;
 
   MouseEvent*     = POINTER TO MouseEventDesc;
-  MouseEventDesc* = RECORD [ABSTRACT] (EventDesc)
+  MouseEventDesc* = ABSTRACT RECORD (EventDesc)
   (**
     Mouse event. The application recieves this event when one or
     more mousebuttons have been pressed or released. You'll also
     get events when the mouse moves.
   *)
                       qualifier* : SET;     (** the qualifier *)
-                      x*,y*      : LONGINT; (** window relative position of mouse *)
+                      x*,y*      : INTEGER; (** window relative position of mouse *)
                     END;
 
   ButtonEvent*    = POINTER TO ButtonEventDesc;
-  ButtonEventDesc* = RECORD [ABSTRACT] (MouseEventDesc)
+  ButtonEventDesc* = ABSTRACT RECORD (MouseEventDesc)
   (**
     Mouse event. The application recieves this event when one or
     more mousebuttons have been pressed or released. You'll also
     get events when the mouse moves.
   *)
-                       type*   : INTEGER;   (** type of mouse event *)
-                       button* : INTEGER;   (** button that caused action *)
+                       type*   : SHORTINT;  (** type of mouse event *)
+                       button* : SHORTINT;  (** button that caused action *)
                      END;
 
   MotionEvent*    = POINTER TO MotionEventDesc;
-  MotionEventDesc* = RECORD [ABSTRACT] (MouseEventDesc)
+  MotionEventDesc* = ABSTRACT RECORD (MouseEventDesc)
   (**
     Mouse event. The application recieves this event when one or
     more mousebuttons have been pressed or released. You'll also
@@ -200,70 +200,70 @@ TYPE
   *)
                      END;
 
-  PROCEDURE GetKeyName*(key : LONGINT; VAR buffer : ARRAY OF CHAR):BOOLEAN;
+  PROCEDURE GetKeyName*(key : INTEGER; OUT buffer : ARRAY OF SHORTCHAR):BOOLEAN;
 
   BEGIN
     CASE key OF
       backspace:
-      COPY("BackSpace",buffer);
+      buffer := "BackSpace";
     | delete:
-      COPY("Delete",buffer);
+      buffer := "Delete";
     | tab:
-      COPY("Tab",buffer);
+      buffer := "Tab";
     | leftTab:
-      COPY("LeftTab",buffer);
+      buffer := "LeftTab";
     | return:
-      COPY("Return",buffer);
+      buffer := "Return";
     | escape:
-      COPY("Escape",buffer);
+      buffer := "Escape";
     | space:
-      COPY("Space",buffer);
+      buffer := "Space";
     | home:
-      COPY("Home",buffer);
+      buffer := "Home";
     | begin:
-      COPY("Begin",buffer);
+      buffer := "Begin";
     | end:
-      COPY("End",buffer);
+      buffer := "End";
     | left:
-      COPY("Left",buffer);
+      buffer := "Left";
     | right:
-      COPY("Right",buffer);
+      buffer := "Right";
     | up:
-      COPY("Up",buffer);
+      buffer := "Up";
     | down:
-      COPY("Down",buffer);
+      buffer := "Down";
     | prior:
-      COPY("Prior",buffer);
+      buffer := "Prior";
     | next:
-      COPY("Next",buffer);
+      buffer := "Next";
     | print:
-      COPY("Print",buffer);
+      buffer := "Print";
     | insert:
-      COPY("Insert",buffer);
+      buffer := "Insert";
     | f1:
-      COPY("F1",buffer);
+      buffer := "F1";
     | f2:
-      COPY("F2",buffer);
+      buffer := "F2";
     | f3:
-      COPY("F3",buffer);
+      buffer := "F3";
     | f4:
-      COPY("F4",buffer);
+      buffer := "F4";
     | f5:
-      COPY("F5",buffer);
+      buffer := "F5";
     | f6:
-      COPY("F6",buffer);
+      buffer := "F6";
     | f7:
-      COPY("F7",buffer);
+      buffer := "F7";
     | f8:
-      COPY("F8",buffer);
+      buffer := "F8";
     | f9:
-      COPY("F9",buffer);
+      buffer := "F9";
     | f10:
-      COPY("F10",buffer);
+      buffer := "F10";
     | f11:
-      COPY("F11",buffer);
+      buffer := "F11";
     | f12:
-      COPY("F12",buffer);
+      buffer := "F12";
     ELSE
       buffer[0]:=0X;
       RETURN FALSE;
@@ -272,7 +272,6 @@ TYPE
     RETURN TRUE;
   END GetKeyName;
 
-  PROCEDURE (e : KeyEvent) [ABSTRACT] GetName*(VAR buffer : ARRAY OF CHAR);
-  END GetName;
+  PROCEDURE (e : KeyEvent) GetName*(OUT buffer : ARRAY OF SHORTCHAR), NEW, ABSTRACT;
 
-END VO:Base:Event.
+END VO_Base_Event.
