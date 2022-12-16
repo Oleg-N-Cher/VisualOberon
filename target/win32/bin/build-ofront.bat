@@ -1,1 +1,1 @@
-@CALL ..\Bin\o2c-ofront.bat && ..\Bin\cc-ofront.bat
+@CALL ..\bin\o2c-ofront.bat && ..\bin\cc-ofront.bat

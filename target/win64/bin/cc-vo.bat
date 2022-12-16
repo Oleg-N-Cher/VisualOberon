@@ -6,9 +6,9 @@ SET CC=gcc.exe -m64 -fPIC -Os -g0 -I..\..\..\src\Ofront -I..\..\..\src\OO2C -I. 
 SET AR=ar.exe -rc ..\VO.a
 IF EXIST ..\VO.a DEL ..\VO.a
 
-%CC% VO_Base_DragDrop.c
+%CC% VO_Base_DragDrop.c VO_Base_Util.c
 IF errorlevel 1 PAUSE
 
-%AR% VO_Base_DragDrop.c
+%AR% VO_Base_DragDrop.o VO_Base_Util.o
 
 DEL /Q *.o

@@ -1,4 +1,4 @@
-MODULE VO:Base:Util[OOC_EXTENSIONS];
+MODULE VO_Base_Util (*OOC_EXTENSIONS*);
 
   (**
     A number of utility functions.
@@ -23,16 +23,15 @@ MODULE VO:Base:Util[OOC_EXTENSIONS];
     59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
   *)
 
-IMPORT      C,
-            Strings;
+IMPORT      C;
 
 TYPE
-  Text* = POINTER TO ARRAY OF CHAR;
-  LongText* = POINTER TO ARRAY OF LONGCHAR;
+  Text* = POINTER TO ARRAY OF SHORTCHAR;
+  LongText* = POINTER TO ARRAY OF CHAR;
 
   (* Some tool-functions *)
 
-  PROCEDURE MaxLong*(a,b : LONGINT):LONGINT;
+  PROCEDURE MaxInt*(a,b : INTEGER):INTEGER;
 
     (**
       Returns the maximum of @oparam{a} and @oparam{b}.
@@ -44,9 +43,9 @@ TYPE
     ELSE
       RETURN b;
     END;
-  END MaxLong;
+  END MaxInt;
 
-  PROCEDURE MinLong*(a,b : LONGINT):LONGINT;
+  PROCEDURE MinInt*(a,b : INTEGER):INTEGER;
 
     (**
       Returns the minumum of @oparam{a} and @oparam{b}.
@@ -58,9 +57,9 @@ TYPE
     ELSE
       RETURN b;
     END;
-  END MinLong;
+  END MinInt;
 
-  PROCEDURE RoundRange*(x,a,b : LONGINT):LONGINT;
+  PROCEDURE RoundRange*(x,a,b : INTEGER):INTEGER;
 
     (**
       If @oparam{x}>b then @oparam{b} will be returned.
@@ -78,7 +77,7 @@ TYPE
     END;
   END RoundRange;
 
-  PROCEDURE UpDiv*(a,b : LONGINT):LONGINT;
+  PROCEDURE UpDiv*(a,b : INTEGER):INTEGER;
 
   BEGIN
     IF a DIV b=0 THEN
@@ -94,14 +93,14 @@ TYPE
     END;
   END UpDiv;
 
-  PROCEDURE RoundDiv*(a,b :LONGINT):LONGINT;
+  PROCEDURE RoundDiv*(a,b :INTEGER):INTEGER;
 
     (**
       Rounds to the nearest integer number.
     *)
 
   VAR
-    c : LONGINT;
+    c : INTEGER;
 
   BEGIN
     c:=a DIV b;
@@ -111,7 +110,7 @@ TYPE
     RETURN c;
   END RoundDiv;
 
-  PROCEDURE RoundUpEven*(a : LONGINT):LONGINT;
+  PROCEDURE RoundUpEven*(a : INTEGER):INTEGER;
 
     (**
       Rounds the number so that is is even. Currently only works correctly for
@@ -129,7 +128,7 @@ TYPE
   PROCEDURE CStringToText*(string : C.string):Text;
 
   VAR
-    length : LONGINT;
+    length : INTEGER;
     text   : Text;
 
   BEGIN
@@ -155,7 +154,7 @@ TYPE
   PROCEDURE CStringToLongText*(string : C.string):LongText;
 
   VAR
-    length : LONGINT;
+    length : INTEGER;
     text   : LongText;
 
   BEGIN
@@ -178,16 +177,16 @@ TYPE
     RETURN text;
   END CStringToLongText;
 
-  PROCEDURE StringToText*(string[NO_COPY] : ARRAY OF CHAR):Text;
+  PROCEDURE StringToText*(IN string : ARRAY OF SHORTCHAR):Text;
 
   VAR
     text : Text;
 
   BEGIN
-    NEW(text,Strings.Length(string)+1);
-    COPY(string,text^);
+    NEW(text,LEN(string$)+1);
+    text^ := string$;
 
     RETURN text;
   END StringToText;
 
-END VO:Base:Util.
+END VO_Base_Util.
