@@ -33,7 +33,7 @@ IMPORT
      `autoImport' entries of all modules importing `Object'.  *)
      
 TYPE
-  UCS4CHAR* = INTEGER;
+  UCS4CHAR* = INTEGER; (**31-bit encoding form between 0 and 7FFFFFFFH *)
 
   Hash* = INTEGER;
   (**The integer type used to store hash values.  *)
