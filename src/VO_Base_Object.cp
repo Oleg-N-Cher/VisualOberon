@@ -1,4 +1,4 @@
-MODULE VO:Base:Object [OOC_EXTENSIONS];
+MODULE VO_Base_Object (*OOC_EXTENSIONS*);
 
   (**
     Implements @otype{Object} the  baseclass for all VisualOberon objects.
@@ -36,6 +36,8 @@ CONST
   customMsg*    = -4;
 
 TYPE
+  STRING = O.String;
+
   Object*           = POINTER TO ObjectDesc;
   MsgObject*        = POINTER TO MsgObjectDesc;
   Handler*          = POINTER TO HandlerDesc;
@@ -48,21 +50,21 @@ TYPE
   Model*            = POINTER TO ModelDesc;
   ModelEntry        = POINTER TO ModelEntryDesc;
 
-  ObjectDesc*       = RECORD [ABSTRACT] (O.ObjectDesc)
+  ObjectDesc*       = ABSTRACT RECORD (O.ObjectDesc)
                         (**
                           The abstract baseclass for all objects in VO. Inherits
                           from the oo2c @otype{O.Object} baseclass.
                         *)
                       END;
 
-  MsgObjectDesc*    = RECORD [ABSTRACT] (ObjectDesc)
+  MsgObjectDesc*    = ABSTRACT RECORD (ObjectDesc)
                         (**
                           This is a second abstract class derived from Object.
 
                           @otype{MsgObject} can send and recieve messages.
                         *)
                         handlerList : HandlerEntry; (** A list of handlers, each message is send to *)
-                        id-         : LONGINT;      (** All objects have an id *)
+                        id-         : INTEGER;      (** All objects have an id *)
                         name-       : STRING;       (** An object can have a nmae *)
                       END;
 
@@ -72,11 +74,11 @@ TYPE
                           class as node.
                         *)
                         next    : HandlerEntry;
-                        type    : LONGINT;      (** The type of message the handler listens to *)
+                        type    : INTEGER;      (** The type of message the handler listens to *)
                         handler : Handler;      (** the handler itself *)
                       END;
 
-  HandlerDesc*      = RECORD
+  HandlerDesc*      = EXTENSIBLE RECORD
                         (**
                           All message sending between objects goes through handlers.
                           Using a @otype{Handler} between the sender and reciever of an
@@ -96,7 +98,7 @@ TYPE
                                                    *)
                       END;
 
-  MessageDesc*      = RECORD
+  MessageDesc*      = EXTENSIBLE RECORD
                         (**
                           The (abstract) baseclass for all messages.
                         *)
@@ -115,14 +117,14 @@ TYPE
                           self-derived class while reduce code bloat and class
                           count.
                         *)
-                        action* : LONGINT;
+                        action* : INTEGER;
                       END;
 
   ActionConverterDesc*= RECORD (HandlerDesc)
-                          action* : LONGINT;
+                          action* : INTEGER;
                         END;
 
-  ResyncMsgDesc*    = RECORD
+  ResyncMsgDesc*    = EXTENSIBLE RECORD
                         (**
                           This message is the abstract baseclass for all
                           resync-messages. A model can send to its viewers
@@ -131,7 +133,7 @@ TYPE
                       END;
 
   NotifyDesc*       = RECORD (ResyncMsgDesc)
-                        notify* : LONGINT;
+                        notify* : INTEGER;
                       END;
 
   ModelEntryDesc    = RECORD
@@ -143,7 +145,7 @@ TYPE
                         object : MsgObject;  (* We could als use a pointer to Object, but this makes more sense for me *)
                       END;
 
-  ModelDesc* = RECORD [ABSTRACT] (MsgObjectDesc)    (* This offers interesting features *)
+  ModelDesc* = ABSTRACT RECORD (MsgObjectDesc)    (* This offers interesting features *)
                  (**
                    The abstract baseclass for all models. A model is a container
                    for an in any way designed datacollection.
@@ -160,7 +162,7 @@ TYPE
                  on         : BOOLEAN;
                END;
 
-  PROCEDURE (o : Object) Init*;
+  PROCEDURE (o : Object) Init*, NEW, EXTENSIBLE;
   (**
     Each object has an initialisation routine.
 
@@ -174,7 +176,7 @@ TYPE
     (* no code *)
   END Init;
 
-  PROCEDURE (o : Object) Free*;
+  PROCEDURE (o : Object) Free*, NEW;
   (**
     All object have some kind of finalizer method. Such a method is needed
     for OS-specific ressources like filehandles or GUI stuff that does not get
@@ -190,7 +192,7 @@ TYPE
     (* no code *)
   END Free;
 
-  PROCEDURE (m : MsgObject) Init*;
+  PROCEDURE (m : MsgObject) Init*, EXTENSIBLE;
   (**
     MsgObject inherits the Init-function from Object.
   *)
@@ -201,7 +203,7 @@ TYPE
     m.name:=NIL;
   END Init;
 
-  PROCEDURE (m : MsgObject) SetId*(id : LONGINT);
+  PROCEDURE (m : MsgObject) SetId*(id : INTEGER), NEW;
   (**
     We must have the ability to set the id of an object
   *)
@@ -210,7 +212,7 @@ TYPE
     m.id:=id;
   END SetId;
 
-  PROCEDURE (o : MsgObject) SetName*(name : STRING);
+  PROCEDURE (o : MsgObject) SetName*(name : STRING), NEW;
     (**
       You can give an object a name. This can be usefull for automatically
       matching models (which also can have a name) with objects.
@@ -219,7 +221,7 @@ TYPE
     o.name:=name;
   END SetName;
 
-  PROCEDURE (m : MsgObject) Receive*(message : Message);
+  PROCEDURE (m : MsgObject) Receive*(message : Message), NEW;
   (**
     This method of an object gets called when someone sends a method
     to it.
@@ -229,7 +231,7 @@ TYPE
     (* no code *)
   END Receive;
 
-  PROCEDURE (m : MsgObject) AddHandler*(handler : Handler; type : LONGINT);
+  PROCEDURE (m : MsgObject) AddHandler*(handler : Handler; type : INTEGER), NEW;
   (**
     You can add a handler to an object.
 
@@ -251,7 +253,7 @@ TYPE
     m.handlerList:=hdlEntry;
   END AddHandler;
 
-  PROCEDURE (m : MsgObject) RemoveHandler*(handler : Handler);
+  PROCEDURE (m : MsgObject) RemoveHandler*(handler : Handler), NEW;
   (**
     You also can remove a handler anytime.
   *)
@@ -277,7 +279,7 @@ TYPE
     END;
   END RemoveHandler;
 
-  PROCEDURE (m : MsgObject) HasHandler*(type : LONGINT):BOOLEAN;
+  PROCEDURE (m : MsgObject) HasHandler*(type : INTEGER):BOOLEAN, NEW;
     (**
       returns @code{TRUE} if the object has a handler for the given type..
     *)
@@ -297,7 +299,7 @@ TYPE
     RETURN FALSE;
   END HasHandler;
 
-  PROCEDURE (m : MsgObject) Forward*(type : LONGINT; destination : MsgObject);
+  PROCEDURE (m : MsgObject) Forward*(type : INTEGER; destination : MsgObject), NEW;
   (**
     You can also tell the object to send msgs of a specific type
     simply to another object.
@@ -314,7 +316,7 @@ TYPE
     m.AddHandler(handler,type);
  END Forward;
 
-  PROCEDURE (h : Handler) Convert*(message : Message):Message;
+  PROCEDURE (h : Handler) Convert*(message : Message):Message, NEW, EXTENSIBLE;
   (**
     This function of the handler gets called after the sender sends the object
     and before the receiver recieves it. This gives you the possibility to
@@ -328,7 +330,7 @@ TYPE
     RETURN message;
   END Convert;
 
-  PROCEDURE (h : Handler) Send*(message : Message);
+  PROCEDURE (h : Handler) Send*(message : Message), NEW;
   (**
     This method gets called by an object for each handler which is interested
     in the message.
@@ -347,7 +349,7 @@ TYPE
     END;
   END Send;
 
-  PROCEDURE (m : MsgObject) Send*(message : Message; type : LONGINT);
+  PROCEDURE (m : MsgObject) Send*(message : Message; type : INTEGER), NEW;
   (**
     Call this method if you want to send a message with a given type.
   *)
@@ -368,7 +370,7 @@ TYPE
     END;
   END Send;
 
-  PROCEDURE (m : MsgObject) Resync*(model : Model; msg : ResyncMsg);
+  PROCEDURE (m : MsgObject) Resync*(model : Model; msg : ResyncMsg), NEW;
   (**
     This method gets called when a model wants you to resync yourself with
     its contents.
@@ -392,7 +394,7 @@ TYPE
     m.on:=TRUE;
   END Init;
 
-  PROCEDURE (m : Model) Push*;
+  PROCEDURE (m : Model) Push*, NEW;
 
     (**
       Make a new working copy of the current value. The original value can be made
@@ -412,7 +414,7 @@ TYPE
   BEGIN
   END Push;
 
-  PROCEDURE (m : Model) Undo*;
+  PROCEDURE (m : Model) Undo*, NEW;
 
     (**
       See Push.
@@ -421,7 +423,7 @@ TYPE
   BEGIN
   END Undo;
 
-  PROCEDURE (m : Model) Save*;
+  PROCEDURE (m : Model) Save*, NEW;
 
     (**
       See Push.
@@ -430,7 +432,7 @@ TYPE
   BEGIN
   END Save;
 
-  PROCEDURE (m : Model) Pop*;
+  PROCEDURE (m : Model) Pop*, NEW;
 
     (**
       See Push.
@@ -439,7 +441,7 @@ TYPE
   BEGIN
   END Pop;
 
-  PROCEDURE (m : Model) AddObject*(object : MsgObject);
+  PROCEDURE (m : Model) AddObject*(object : MsgObject), NEW;
   (**
     Add an object (viewer) to a model
   *)
@@ -459,7 +461,7 @@ TYPE
     m.lastObject:=entry;
   END AddObject;
 
-  PROCEDURE (m : Model) RemoveObject*(object : MsgObject);
+  PROCEDURE (m : Model) RemoveObject*(object : MsgObject), NEW;
   (**
     Remove an object from an model.
   *)
@@ -484,7 +486,7 @@ TYPE
     END;
   END RemoveObject;
 
-  PROCEDURE (m : Model) Notify*(msg : ResyncMsg);
+  PROCEDURE (m : Model) Notify*(msg : ResyncMsg), NEW;
   (**
     A model should call this method with an optional resynmessage
     when you want your viewers to resync themselfs.
@@ -505,7 +507,7 @@ TYPE
     END;
   END Notify;
 
-  PROCEDURE (m : Model) On*;
+  PROCEDURE (m : Model) On*, NEW;
 
     (**
       Switch on communication between the @otype{Model} and its
@@ -523,7 +525,7 @@ TYPE
     END;
   END On;
 
-  PROCEDURE (m : Model) Off*;
+  PROCEDURE (m : Model) Off*, NEW;
 
     (**
       Switch off communication between the @otype{Model} and its
@@ -539,7 +541,7 @@ TYPE
     m.on:=FALSE;
   END Off;
 
-  PROCEDURE (m : Model) IsOn*():BOOLEAN;
+  PROCEDURE (m : Model) IsOn*():BOOLEAN, NEW;
 
     (**
       Tell if the @otype{Model} is currently switch on or off.
@@ -549,7 +551,7 @@ TYPE
     RETURN m.on;
   END IsOn;
 
-  PROCEDURE (m : MsgObject) UnattachModel*(model : Model);
+  PROCEDURE (m : MsgObject) UnattachModel*(model : Model), NEW;
   (**
     Deattach the @otype{MsgObject} from the given @oparam{model}.
   *)
@@ -558,7 +560,7 @@ TYPE
     model.RemoveObject(m);
   END UnattachModel;
 
-  PROCEDURE (m : MsgObject) AttachModel*(model : Model);
+  PROCEDURE (m : MsgObject) AttachModel*(model : Model), NEW;
   (**
     Use this function to attach an @otype{MsgObject} to the given @oparam{model}.
 
@@ -582,4 +584,5 @@ TYPE
 
     RETURN msg;
   END Convert;
-END VO:Base:Object.
+
+END VO_Base_Object.
