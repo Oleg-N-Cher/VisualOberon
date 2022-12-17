@@ -1,5 +1,5 @@
 (* 	$Id: RealMath.cp,v 1.10 2022/12/15 5:30:24 mva Exp $	 *)
-MODULE [foreign] RealMath (* INTERFACE "C"
+MODULE [noinit] RealMath (* INTERFACE "C"
   <* IF HAVE_LIB_M THEN *> ; LINK LIB "m" END <* END *> *);
 (*  Math functions for REAL.
     Copyright (C) 2002,2003  Michael van Acken
@@ -63,8 +63,13 @@ PROCEDURE- power* (base, exponent: SHORTREAL): SHORTREAL "(float)pow(base, expon
 (**Returns the value of the number base raised to the power exponent 
      for base > 0.  *)
 
-PROCEDURE- round* (x: SHORTREAL): INTEGER "((x)>=0.0f?(INTEGER)(x+0.5f):(INTEGER)(x-0.5f))";
+PROCEDURE- round_macro (x: SHORTREAL): INTEGER "((x)>=0.0f?(INTEGER)(x+0.5f):(INTEGER)(x-0.5f))";
 (**Returns the value of x rounded to the nearest integer.  *)
+
+PROCEDURE round* (x: SHORTREAL): INTEGER;
+(**Returns the value of x rounded to the nearest integer.  *)
+BEGIN RETURN round_macro(x)
+END round;
 
 PROCEDURE- sincos* (x: SHORTREAL; OUT sin, cos: SHORTREAL) "(float)sincos(x, sin, cos)";
 (**More efficient sin/cos implementation if both values are needed.  *)

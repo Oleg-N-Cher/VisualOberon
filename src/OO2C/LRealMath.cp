@@ -1,5 +1,5 @@
 (* 	$Id: LRealMath.cp,v 1.7 2022/12/15 5:14:17 mva Exp $	 *)
-MODULE [foreign] LRealMath (* INTERFACE "C"
+MODULE [noinit] LRealMath (* INTERFACE "C"
   <* IF HAVE_LIB_M THEN *> ; LINK LIB "m" END <* END *> *);
 (*  Math functions for LONGREAL.
     Copyright (C) 2002,2003  Michael van Acken
@@ -57,8 +57,12 @@ PROCEDURE- power* (base, exponent: REAL): REAL "pow(base, exponent)";
 (**Returns the value of the number base raised to the power exponent 
      for base > 0.  *)
 
-PROCEDURE- round* (x: REAL): INTEGER "((x)>=0.0?(INTEGER)(x+0.5):(INTEGER)(x-0.5))";
+PROCEDURE- round_macro (x: REAL): INTEGER "((x)>=0.0?(INTEGER)(x+0.5):(INTEGER)(x-0.5))";
+
+PROCEDURE round* (x: REAL): INTEGER;
 (**Returns the value of x rounded to the nearest integer.  *)
+BEGIN RETURN round_macro(x)
+END round;
 
 PROCEDURE- sincos* (x: REAL; OUT sin, cos: REAL) "sincos(x, sin, cos)";
 (**More efficient sin/cos implementation if both values are needed.  *)
